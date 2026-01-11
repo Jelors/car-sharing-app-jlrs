@@ -7,40 +7,39 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.net.URL;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "cars")
-@SQLDelete(sql = "UPDATE cars SET is_deleted = true WHERE id=?")
+@Table(name = "payment")
+@SQLDelete(sql = "UPDATE payment SET is_deleted = true WHERE id=?")
 @SQLRestriction("is_deleted = false")
 @Getter
 @Setter
-public class Car {
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String model;
-
-    @Column(nullable = false, unique = true)
-    private String brand;
-
-    @Column(name = "daily_fee", nullable = false)
-    private BigDecimal dailyFee;
-
-    private int inventory;
-
     @Column(nullable = false)
-    private boolean is_deleted = false;
+    private Long rentalId;
+
+    private URL sessionUrl; // URL for the payment session with a payment provider
+
+    private Long sessionId; // ID of the payment session
+
+    private BigDecimal total; // calculated rental total price ($USD)
+
+    public enum Status {
+        PENDING,
+        PAID
+    }
 
     public enum Type {
-        SEDAN,
-        SUV,
-        HATCHBACK,
-        UNIVERSAL
+        PAYMENT,
+        FINE
     }
 }
