@@ -39,8 +39,7 @@ public class User {
         CUSTOMER
     }
 
-    @Column(nullable = false)
-    private boolean is_deleted = false;
-
+    @Column(name = "is_deleted",nullable = false)
+    private boolean isDeleted = false;
 
 }

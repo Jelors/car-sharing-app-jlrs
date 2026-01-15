@@ -34,8 +34,8 @@ public class Car {
 
     private int inventory;
 
-    @Column(nullable = false)
-    private boolean is_deleted = false;
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 
     public enum Type {
         SEDAN,
