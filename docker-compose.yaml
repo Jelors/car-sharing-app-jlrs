@@ -1,41 +1,50 @@
 services:
-  postgres:
-    image: postgres:17
+  mysqldb:
+    image: mysql:8.0
+    container_name: mysqldb_carsharing
+    restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      TZ: Europe/Kyiv
-
+      MYSQL_ROOT_PASSWORD: ${MYSQLDB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQLDB_DATABASE}
     ports:
-      - '${POSTGRES_DOCKER_PORT}:5432'
+      - "${MYSQLDB_LOCAL_PORT}:${MYSQLDB_DOCKER_PORT}"
+
     volumes:
-      - postgresql_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
     networks:
-      - carsharing-network
+      - carsharing_app
 
   app:
-    image: carsharing
+    image: carsharing_app
     build: .
-    container_name: carsharing
+    container_name: carsharing_app
     depends_on:
-      - postgres
-
-    environment:
-      TZ: Europe/Kyiv
-      JAVA_TOOL_OPTIONS: "-Duser.timezone=Europe/Kyiv"
+      - mysqldb
 
     ports:
-      - '${APP_LOCAL_PORT}:${APP_DOCKER_PORT}'
+      - "${APP_LOCAL_PORT}:${APP_DOCKER_PORT}"
+      - "${DEBUG_PORT}:${DEBUG_PORT}"
 
     env_file:
       - .env
+
+    environment:
+      SPRING_DATASOURCE_ULR: jdbc:mysql://mysqldb:${MYSQLDB_DOCKER_PORT}/${MYSQLDB_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQLDB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQLDB_ROOT_PASSWORD}
     networks:
-      - carsharing-network
+      - carsharing_app
 
 volumes:
-  postgresql_data:
-
+  mysql_data:
 networks:
-  carsharing-network:
+  carsharing_app:
     driver: bridge
