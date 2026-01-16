@@ -8,7 +8,6 @@ import jlrs.carsharing.dto.UserLoginResponseDto;
 import jlrs.carsharing.dto.UserRegistrationRequestDto;
 import jlrs.carsharing.dto.UserResponseDto;
 import jlrs.carsharing.security.auth.AuthenticationService;
-import jlrs.carsharing.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @Tag(name = "Authentication Manager", description = "Endpoints for managing authentication")
 public class AuthenticationController {
-    private final UserService userService;
     private final AuthenticationService authenticationService;
 
     @PostMapping("/registration")
@@ -34,7 +32,7 @@ public class AuthenticationController {
             @RequestBody @Valid UserRegistrationRequestDto registrationRequest
     ) {
         return new ResponseEntity<UserResponseDto>(
-                userService.register(registrationRequest),
+                authenticationService.register(registrationRequest),
                 HttpStatus.CREATED
         );
     }

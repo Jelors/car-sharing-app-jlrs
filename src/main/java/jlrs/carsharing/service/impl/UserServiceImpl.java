@@ -1,18 +1,16 @@
 package jlrs.carsharing.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.util.Set;
-import jlrs.carsharing.dto.UserRegistrationRequestDto;
+import jlrs.carsharing.dto.UpdatePasswordRequestDto;
+import jlrs.carsharing.dto.UpdateProfileRequestDto;
+import jlrs.carsharing.dto.UpdateUserRoleRequestDto;
 import jlrs.carsharing.dto.UserResponseDto;
-import jlrs.carsharing.exception.RegistrationException;
-import jlrs.carsharing.exception.RoleNotFoundException;
 import jlrs.carsharing.mapper.UserMapper;
 import jlrs.carsharing.model.User;
-import jlrs.carsharing.model.UserRole;
 import jlrs.carsharing.repository.UserRepository;
-import jlrs.carsharing.repository.UserRoleRepository;
 import jlrs.carsharing.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,30 +18,47 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
-    private final UserRoleRepository userRoleRepository;
+    private final UserDetailsServiceImpl userDetailsService;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
+    /* return's info about user: {EMAIL}, {FIRST_NAME}, {LAST_NAME} */
     @Override
-    public UserResponseDto register(UserRegistrationRequestDto registrationRequest)
-            throws RegistrationException {
-        if (userRepository.existsByEmail(registrationRequest.getEmail())) {
-            throw new RegistrationException("User with email "
-                    + registrationRequest.getEmail()
-                    + " already registered!");
-        }
+    public UserResponseDto getProfileInfo() {
+        String email = userDetailsService.getCurrentUserEmail();
+        return userRepository.findByEmail(email)
+                .map(userMapper::toUserResponse)
+                .orElseThrow(() -> new EntityNotFoundException("Can't load user's profile!"));
+    }
 
-        UserRole userRole = userRoleRepository
-                .findByRoleName(UserRole.RoleName.CUSTOMER)
-                .orElseThrow(() -> new RoleNotFoundException("Role CUSTOMER not found!"));
+    /* receives {USER_ID} and request for updating {USERS ROLES}(Set) */
+    @Override
+    public UserResponseDto updateUserRole(
+            Long userId,
+            UpdateUserRoleRequestDto updateRequest
+    ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "User with id {" + userId + "} not found!"
+                ));
+        user.setRoles(Set.of(updateRequest.getRole()));
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
 
-        User user = userMapper.toModel(registrationRequest);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(Set.of(userRole));
+    /* receives request for updating user's {FIRST_NAME} and {LAST_NAME} /|||\ {EMAIL} can't be updated */
+    @Override
+    public UserResponseDto updateUserProfile(UpdateProfileRequestDto updateProfileRequest) {
+        User user = userDetailsService.getCurrentUser();
+        user.setFirstName(updateProfileRequest.getFirstName());
+        user.setLastName(updateProfileRequest.getLastName());
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
 
-        userRepository.save(user);
-
-        return userMapper.toUserResponse(user);
+    /* receives request for updating user's {PASSWORD} */
+    @Override
+    public UserResponseDto updateUserPassword(UpdatePasswordRequestDto updatePasswordRequest) {
+        User user = userDetailsService.getCurrentUser();
+        user.setPassword(updatePasswordRequest.getPassword());
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 }

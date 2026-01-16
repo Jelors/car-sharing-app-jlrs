@@ -1,0 +1,13 @@
+package jlrs.carsharing.dto;
+
+import jlrs.carsharing.model.UserRole;
+import jlrs.carsharing.validation.user.Status;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class UpdateUserRoleRequestDto {
+    @Status(enumClass = UserRole.RoleName.class)
+    private UserRole role;
+}
