@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-payment-table
+      author: jelors
+      changes:
+        - createTable:
+            tableName: payment
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: rental_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: session_url
+                  type: varchar(2048)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: session_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: total
+                  type: decimal
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: is_deleted
+                  type: bit(1)
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
