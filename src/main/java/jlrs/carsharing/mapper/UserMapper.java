@@ -7,7 +7,7 @@ import jlrs.carsharing.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-@Mapper(config = MapperConfig.class)
+@Mapper(componentModel = "spring", config = MapperConfig.class)
 public interface UserMapper {
     User toModel(UserRegistrationRequestDto createUserRequestDto);
 
