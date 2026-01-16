@@ -27,7 +27,7 @@ public class Payment {
     @Column(name = "rental_id", nullable = false)
     private Long rentalId;
 
-    @Column(name = "session_url", nullable = false ,length = 2048)
+    @Column(name = "session_url", nullable = false, length = 2048)
     private URL sessionUrl; // URL for the payment session with a payment provider
 
     @Column(name = "session_id", nullable = false)

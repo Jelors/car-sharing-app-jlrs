@@ -26,7 +26,10 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/registration")
-    @Operation(summary = "Register a new user", description = "Register a new user")
+    @Operation(
+            summary = "Register a new user",
+            description = "Register a new user"
+    )
     public ResponseEntity<UserResponseDto> register(
             @RequestBody @Valid UserRegistrationRequestDto registrationRequest
     ) {
@@ -37,7 +40,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Authenticate user", description = "Authenticate user by email and password")
+    @Operation(
+            summary = "Authenticate user",
+            description = "Authenticate user by email and password"
+    )
     public ResponseEntity<UserLoginResponseDto> login(
             @RequestBody @Valid UserLoginRequestDto loginRequest
     ) {

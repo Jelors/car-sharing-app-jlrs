@@ -51,6 +51,9 @@ public class User implements UserDetails {
     )
     private Set<UserRole> roles = new HashSet<>();
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
@@ -67,8 +70,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return !isDeleted;
     }
-
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted = false;
 
 }
