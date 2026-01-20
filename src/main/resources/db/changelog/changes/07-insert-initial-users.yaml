@@ -1,0 +1,102 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-initial-roles
+      author: jelors
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: role
+                  value: MANAGER
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: role
+                  value: CUSTOMER
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+
+  - changeSet:
+      id: insert-initial-users
+      author: jelors
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: email
+                  value: admin@example.com
+              - column:
+                  name: first_name
+                  value: Admin
+              - column:
+                  name: last_name
+                  value: Adminov
+              - column:
+                  name: password
+                  value: "$2a$10$JVJIs6etszWD4YsLEyz13OlPFd5oSz5z2SAXnJsBczYKHn9oeeb3a" # adminPassword
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: email
+                  value: user@example.com
+              - column:
+                  name: first_name
+                  value: User
+              - column:
+                  name: last_name
+                  value: Userovich
+              - column:
+                  name: password
+                  value: "$2a$10$SYDyezwHhMugRIj6dNztU.CADwzrDR9yGcQ69d7zTOi8pTIpy0zSO" # userPassword
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+
+  - changeSet:
+      id: insert-users-roles-mapping
+      author: jelors
+      changes:
+        - insert:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueNumeric: 1
+              - column:
+                  name: role_id
+                  valueNumeric: 1
+
+        - insert:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueNumeric: 2
+              - column:
+                  name: role_id
+                  valueNumeric: 2

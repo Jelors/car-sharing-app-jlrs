@@ -17,12 +17,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email)
-            throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(
-                        "User with email: " + email + " not found!"
-                ));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        System.out.println("TRYING TO FIND USER WITH EMAIL: " + username);
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> {
+                    System.out.println("USER NOT FOUND IN DB");
+                    return new UsernameNotFoundException(username);
+                });
+        System.out.println("USER FOUND: " + user.getEmail());
+        return user;
     }
 
     public Long getCurrentUserId() {
@@ -52,4 +55,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 ));
         return user.getEmail();
     }
+
 }

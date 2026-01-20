@@ -22,7 +22,9 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
 
-    /* return's info about user: {EMAIL}, {FIRST_NAME}, {LAST_NAME} */
+    /*
+        return's info about user: {EMAIL}, {FIRST_NAME}, {LAST_NAME}
+    */
     @Override
     public UserResponseDto getProfileInfo() {
         String email = userDetailsService.getCurrentUserEmail();
@@ -31,7 +33,11 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("Can't load user's profile!"));
     }
 
-    /* receives {USER_ID} and request for updating {USERS ROLES}(Set) */
+    /*
+        update user role.
+        request needs: {USER_ID}, {ROLE}
+        returns: {EMAIL}, {FIRST_NAME}, {LAST_NAME}
+     */
     @Override
     public UserResponseDto updateUserRole(
             Long userId,
@@ -45,7 +51,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    /* receives request for updating user's {FIRST_NAME} and {LAST_NAME} /|||\ {EMAIL} can't be updated */
+    /*
+        update user profile. !!! EMAIL CAN'T BE UPDATED !!!
+        request needs: {FIRST_NAME}, {LAST_NAME}
+        returns: {EMAIL}, {FIRST_NAME}, {LAST_NAME}
+     */
     @Override
     public UserResponseDto updateUserProfile(UpdateProfileRequestDto updateProfileRequest) {
         User user = userDetailsService.getCurrentUser();
@@ -54,7 +64,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    /* receives request for updating user's {PASSWORD} */
+    /*
+        update user password.
+        request needs: {PASSWORD}, {REPEAT_PASSWORD}
+        returns: {EMAIL}, {FIRST_NAME}, {LAST_NAME}
+     */
     @Override
     public UserResponseDto updateUserPassword(UpdatePasswordRequestDto updatePasswordRequest) {
         User user = userDetailsService.getCurrentUser();

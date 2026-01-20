@@ -32,6 +32,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
+    /*
+        authenticate user.
+        request needs: {EMAIL}, {PASSWORD}
+        returns: {TOKEN}
+     */
     @Override
     public UserLoginResponseDto authenticate(UserLoginRequestDto loginRequest) {
         final Authentication authentication = authenticationManager.authenticate(
@@ -45,6 +50,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new UserLoginResponseDto(token);
     }
 
+    /*
+        register a new user.
+        request needs: {EMAIL}, {PASSWORD}, {REPEAT_PASSWORD}, {FIRST_NAME}, {LAST_NAME}
+        returns: {EMAIL}, {FIRST_NAME}, {LAST_NAME}
+    */
     @Override
     public UserResponseDto register(UserRegistrationRequestDto registrationRequest)
             throws RegistrationException {
@@ -55,7 +65,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         UserRole userRole = userRoleRepository
-                .findByRoleName(UserRole.RoleName.CUSTOMER)
+                .findByRole(UserRole.RoleName.CUSTOMER)
                 .orElseThrow(() -> new RoleNotFoundException("Role CUSTOMER not found!"));
 
         User user = userMapper.toModel(registrationRequest);

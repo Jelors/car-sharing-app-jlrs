@@ -20,17 +20,17 @@ databaseChangeLog:
 
         - addForeignKeyConstraint:
             baseTableName: users_roles
-            baseColumnName: user_id
+            baseColumnNames: user_id
             referencedTableName: users
-            referencedColumnName: id
+            referencedColumnNames: id
             onDelete: CASCADE
             constraintName: fk_users_roles_user
 
         - addForeignKeyConstraint:
             baseTableName: users_roles
-            baseColumnName: role_id
+            baseColumnNames: role_id
             referencedTableName: roles
-            referencedColumnName: id
+            referencedColumnNames: id
             onDelete: CASCADE
             constraintName: fk_users_roles_role
 
