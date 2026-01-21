@@ -46,11 +46,11 @@ public class UsersController {
             description = "Updates user role"
     )
     public ResponseEntity<UserResponseDto> updateUserRole(
-            @PathVariable Long userId,
+            @PathVariable Long id,
             @RequestBody @Valid UpdateUserRoleRequestDto roleRequestDto
     ) {
         return new ResponseEntity<>(
-                userService.updateUserRole(userId, roleRequestDto),
+                userService.updateUserRole(id, roleRequestDto),
                 HttpStatus.OK
         );
     }

@@ -18,14 +18,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println("TRYING TO FIND USER WITH EMAIL: " + username);
-        User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> {
-                    System.out.println("USER NOT FOUND IN DB");
-                    return new UsernameNotFoundException(username);
-                });
-        System.out.println("USER FOUND: " + user.getEmail());
-        return user;
+        return userRepository.findByEmail(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("Can't find user with email: " + username)
+                );
     }
 
     public Long getCurrentUserId() {
@@ -40,18 +36,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public User getCurrentUser() {
-        Long userId = getCurrentUserId();
-        return userRepository.findById(userId)
+        Long id = getCurrentUserId();
+        return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "User with id " + userId + " not found!"
+                        "User with id " + id + " not found!"
                 ));
     }
 
     public String getCurrentUserEmail() {
-        Long userId = getCurrentUserId();
-        User user = userRepository.findById(userId)
+        Long id = getCurrentUserId();
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "User with id {" + userId + "} not found!"
+                        "User with id {" + id + "} not found!"
                 ));
         return user.getEmail();
     }

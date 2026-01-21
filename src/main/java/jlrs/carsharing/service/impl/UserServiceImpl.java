@@ -11,6 +11,7 @@ import jlrs.carsharing.model.User;
 import jlrs.carsharing.repository.UserRepository;
 import jlrs.carsharing.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class UserServiceImpl implements UserService {
     private final UserDetailsServiceImpl userDetailsService;
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /*
         return's info about user: {EMAIL}, {FIRST_NAME}, {LAST_NAME}
@@ -40,12 +42,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserResponseDto updateUserRole(
-            Long userId,
+            Long id,
             UpdateUserRoleRequestDto updateRequest
     ) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "User with id {" + userId + "} not found!"
+                        "User with id {" + id + "} not found!"
                 ));
         user.setRoles(Set.of(updateRequest.getRole()));
         return userMapper.toUserResponse(userRepository.save(user));
@@ -72,7 +74,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto updateUserPassword(UpdatePasswordRequestDto updatePasswordRequest) {
         User user = userDetailsService.getCurrentUser();
-        user.setPassword(updatePasswordRequest.getPassword());
+        user.setPassword(passwordEncoder.encode(updatePasswordRequest.getPassword()));
         return userMapper.toUserResponse(userRepository.save(user));
     }
 }
