@@ -34,7 +34,9 @@ public class CarsController {
             summary = "Add new car to DB",
             description = "Insert new car in database"
     )
-    public ResponseEntity<CarDto> insertNewCar(@RequestBody @Valid CreateCarRequestDto createCarRequest) {
+    public ResponseEntity<CarDto> insertNewCar(
+            @RequestBody @Valid CreateCarRequestDto createCarRequest
+    ) {
         return new ResponseEntity<>(
                 carService.insertNewCar(createCarRequest),
                 HttpStatus.CREATED
@@ -83,7 +85,7 @@ public class CarsController {
         );
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/add")
     @PreAuthorize("hasRole('MANAGER')")
     @Operation(
             summary = "Add amount to car's inventory",
@@ -96,7 +98,7 @@ public class CarsController {
         carService.addInventory(id, amount);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/reduce")
     @PreAuthorize("hasRole('MANAGER')")
     @Operation(
             summary = "Minus amount from car's inventory",
