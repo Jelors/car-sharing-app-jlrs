@@ -1,10 +1,10 @@
 package jlrs.carsharing.security.auth;
 
 import java.util.Set;
-import jlrs.carsharing.dto.UserLoginRequestDto;
-import jlrs.carsharing.dto.UserLoginResponseDto;
-import jlrs.carsharing.dto.UserRegistrationRequestDto;
-import jlrs.carsharing.dto.UserResponseDto;
+import jlrs.carsharing.dto.user.auth.UserLoginRequestDto;
+import jlrs.carsharing.dto.user.auth.UserLoginResponseDto;
+import jlrs.carsharing.dto.user.auth.UserRegistrationRequestDto;
+import jlrs.carsharing.dto.user.UserResponseDto;
 import jlrs.carsharing.exception.RegistrationException;
 import jlrs.carsharing.exception.RoleNotFoundException;
 import jlrs.carsharing.mapper.UserMapper;

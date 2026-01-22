@@ -1,4 +1,4 @@
-package jlrs.carsharing.dto;
+package jlrs.carsharing.dto.user.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

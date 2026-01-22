@@ -1,4 +1,4 @@
-package jlrs.carsharing.dto;
+package jlrs.carsharing.dto.user.profile;
 
 import jakarta.validation.constraints.NotBlank;
 import jlrs.carsharing.validation.FieldMatch;

@@ -1,11 +1,11 @@
-package jlrs.carsharing.service.impl;
+package jlrs.carsharing.service.impl.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.Set;
-import jlrs.carsharing.dto.UpdatePasswordRequestDto;
-import jlrs.carsharing.dto.UpdateProfileRequestDto;
-import jlrs.carsharing.dto.UpdateUserRoleRequestDto;
-import jlrs.carsharing.dto.UserResponseDto;
+import jlrs.carsharing.dto.user.profile.UpdatePasswordRequestDto;
+import jlrs.carsharing.dto.user.profile.UpdateProfileRequestDto;
+import jlrs.carsharing.dto.user.profile.UpdateUserRoleRequestDto;
+import jlrs.carsharing.dto.user.UserResponseDto;
 import jlrs.carsharing.mapper.UserMapper;
 import jlrs.carsharing.model.User;
 import jlrs.carsharing.repository.UserRepository;

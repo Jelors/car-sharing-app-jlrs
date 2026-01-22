@@ -1,4 +1,4 @@
-package jlrs.carsharing.dto;
+package jlrs.carsharing.dto.user;
 
 import lombok.Getter;
 import lombok.Setter;
