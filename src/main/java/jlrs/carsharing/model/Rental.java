@@ -2,9 +2,12 @@ package jlrs.carsharing.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import lombok.Getter;
@@ -29,14 +32,19 @@ public class Rental {
     @Column(name = "return_date", nullable = false)
     private LocalDate returnDate;
 
-    @Column(name = "actual_return_date", nullable = false)
+    @Column(name = "actual_return_date")
     private LocalDate actualReturnDate;
 
-    @Column(name = "car_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "car_id", nullable = false)
     private Long carId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User userId;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;

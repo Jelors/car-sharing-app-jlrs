@@ -29,20 +29,22 @@ databaseChangeLog:
               - column:
                   name: actual_return_date
                   type: date
-                  constraints:
-                    nullable: false
 
               - column:
                   name: car_id
                   type: bigint
                   constraints:
                     nullable: false
+                    foreignKeyName: fk_rental_car
+                    references: cars(id)
 
               - column:
                   name: user_id
                   type: bigint
                   constraints:
                     nullable: false
+                    foreignKeyName: fk_rental_user
+                    references: users(id)
 
               - column:
                   name: is_deleted
