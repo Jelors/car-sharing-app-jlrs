@@ -1,4 +1,4 @@
-package jlrs.carsharing.service.impl;
+package jlrs.carsharing.service.impl.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import jlrs.carsharing.model.User;

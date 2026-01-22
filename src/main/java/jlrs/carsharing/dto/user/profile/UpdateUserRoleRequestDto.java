@@ -1,4 +1,4 @@
-package jlrs.carsharing.dto;
+package jlrs.carsharing.dto.user.profile;
 
 import jlrs.carsharing.model.UserRole;
 import jlrs.carsharing.validation.user.Status;

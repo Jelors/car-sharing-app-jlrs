@@ -2,10 +2,10 @@ package jlrs.carsharing.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jlrs.carsharing.dto.UserLoginRequestDto;
-import jlrs.carsharing.dto.UserLoginResponseDto;
-import jlrs.carsharing.dto.UserRegistrationRequestDto;
-import jlrs.carsharing.dto.UserResponseDto;
+import jlrs.carsharing.dto.user.UserResponseDto;
+import jlrs.carsharing.dto.user.auth.UserLoginRequestDto;
+import jlrs.carsharing.dto.user.auth.UserLoginResponseDto;
+import jlrs.carsharing.dto.user.auth.UserRegistrationRequestDto;
 import jlrs.carsharing.security.auth.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
