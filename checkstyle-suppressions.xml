@@ -7,4 +7,7 @@
     <suppress
             files=".*[/\\]target[/\\].*"
             checks=".*"/>
+    <suppress
+            files=".*[/\\]resources[/\\].*"
+            checks=".*"/>
 </suppressions>

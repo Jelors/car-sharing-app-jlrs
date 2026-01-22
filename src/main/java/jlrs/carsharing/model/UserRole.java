@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 
 @Entity
@@ -34,7 +33,7 @@ public class UserRole implements GrantedAuthority {
     private boolean isDeleted = false;
 
     @Override
-    public @Nullable String getAuthority() {
+    public String getAuthority() {
         return role.name();
     }
 
