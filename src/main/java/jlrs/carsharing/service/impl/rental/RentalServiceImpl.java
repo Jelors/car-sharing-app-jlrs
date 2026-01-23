@@ -6,7 +6,9 @@ import java.util.List;
 import jlrs.carsharing.dto.rental.CreateRentalRequestDto;
 import jlrs.carsharing.dto.rental.RentalDto;
 import jlrs.carsharing.mapper.RentalMapper;
+import jlrs.carsharing.model.Car;
 import jlrs.carsharing.model.Rental;
+import jlrs.carsharing.repository.CarRepository;
 import jlrs.carsharing.repository.RentalRepository;
 import jlrs.carsharing.service.RentalService;
 import jlrs.carsharing.service.impl.user.UserDetailsServiceImpl;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalService {
     private final RentalRepository rentalRepository;
+    private final CarRepository carRepository;
     private final RentalMapper rentalMapper;
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -28,17 +31,32 @@ public class RentalServiceImpl implements RentalService {
         rental.setCarId(createRentalRequest.getCarId());
         rental.setUserId(userDetailsService.getCurrentUser());
 
+        Car car = carRepository.findById(rental.getCarId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Can't find car with ID: {" + rental.getCarId() + "}"
+                ));
+        car.setInventory(car.getInventory() - 1);
+        carRepository.save(car);
+
         return rentalMapper.toDto(rentalRepository.save(rental));
     }
 
     @Override
-    public RentalDto addActualReturnDate(Long id) {
-        Rental rental = rentalRepository.findById(id)
+    public RentalDto addActualReturnDate(Long rentalId) {
+        Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "\"Rental with ID: {" + id + "} not found!\""
+                        "Rental with ID: {" + rentalId + "} not found!"
                 ));
         rental.setActualReturnDate(LocalDate.now());
         rental.setActive(false);
+
+        Car car = carRepository.findById(rental.getCarId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Can't find car with ID: {" + rental.getCarId() + "}"
+                ));
+        car.setInventory(car.getInventory() + 1);
+        carRepository.save(car);
+
         return rentalMapper.toDto(rentalRepository.save(rental));
     }
 

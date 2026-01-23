@@ -7,7 +7,7 @@ import jlrs.carsharing.dto.rental.RentalDto;
 public interface RentalService {
     RentalDto addRental(CreateRentalRequestDto createRentalRequest);
 
-    RentalDto addActualReturnDate(Long id);
+    RentalDto addActualReturnDate(Long rentalId);
 
     RentalDto getRental(Long id);
 
