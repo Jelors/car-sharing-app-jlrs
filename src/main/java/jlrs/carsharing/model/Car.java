@@ -28,7 +28,7 @@ public class Car {
     @Column(nullable = false, unique = true)
     private String model;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String brand;
 
     @Column(name = "daily_fee", nullable = false)

@@ -20,6 +20,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarDto insertNewCar(CreateCarRequestDto createCarRequest) {
         Car car = carMapper.toModel(createCarRequest);
+        car.setInventory(1);
         carRepository.save(car);
         return carMapper.toDto(car);
     }
@@ -70,7 +71,7 @@ public class CarServiceImpl implements CarService {
         if (amount < 0) {
             throw new IllegalArgumentException("Amount can't be less than 0!");
         }
-        car.setInventory(amount);
+        car.setInventory(car.getInventory() + amount);
         carRepository.save(car);
     }
 
