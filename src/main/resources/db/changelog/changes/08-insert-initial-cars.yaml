@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-initial-cars
+      author: jelors
+      changes:
+        - insert:
+            tableName: cars
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: model
+                  value: A-class
+              - column:
+                  name: brand
+                  value: Mercedes-Benz
+              - column:
+                  name: daily_fee
+                  valueNumeric: 500
+              - column:
+                  name: type
+                  value: HATCHBACK
+              - column:
+                  name: inventory
+                  valueNumeric: 1
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+
+        - insert:
+            tableName: cars
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: model
+                  value: A7
+              - column:
+                  name: brand
+                  value: Audi
+              - column:
+                  name: daily_fee
+                  valueNumeric: 1150
+              - column:
+                  name: type
+                  value: SEDAN
+              - column:
+                  name: inventory
+                  valueNumeric: 1
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
