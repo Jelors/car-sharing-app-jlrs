@@ -2,8 +2,8 @@ package jlrs.carsharing.service.impl.car;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import jlrs.carsharing.dto.car.CarDto;
-import jlrs.carsharing.dto.car.CreateCarRequestDto;
+import jlrs.carsharing.dto.car.CarResponse;
+import jlrs.carsharing.dto.car.CreateCarRequest;
 import jlrs.carsharing.mapper.CarMapper;
 import jlrs.carsharing.model.Car;
 import jlrs.carsharing.repository.CarRepository;
@@ -18,7 +18,7 @@ public class CarServiceImpl implements CarService {
     private final CarMapper carMapper;
 
     @Override
-    public CarDto insertNewCar(CreateCarRequestDto createCarRequest) {
+    public CarResponse insertNewCar(CreateCarRequest createCarRequest) {
         Car car = carMapper.toModel(createCarRequest);
         car.setInventory(1);
         carRepository.save(car);
@@ -26,7 +26,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public CarDto getCarInformation(Long id) {
+    public CarResponse getCarInformation(Long id) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Car with id {" + id + "} not found!"
@@ -35,7 +35,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public CarDto updateCarInformation(Long id, CreateCarRequestDto updateCarRequest) {
+    public CarResponse updateCarInformation(Long id, CreateCarRequest updateCarRequest) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Car with id {" + id + "} not found!"
@@ -49,7 +49,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public List<CarDto> getAllCars() {
+    public List<CarResponse> getAllCars() {
         return carRepository.findAll()
                 .stream()
                 .map(carMapper::toDto)

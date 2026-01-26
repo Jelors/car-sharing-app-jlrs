@@ -1,10 +1,10 @@
 package jlrs.carsharing.security.auth;
 
 import java.util.Set;
-import jlrs.carsharing.dto.user.UserResponseDto;
-import jlrs.carsharing.dto.user.auth.UserLoginRequestDto;
-import jlrs.carsharing.dto.user.auth.UserLoginResponseDto;
-import jlrs.carsharing.dto.user.auth.UserRegistrationRequestDto;
+import jlrs.carsharing.dto.user.UserResponse;
+import jlrs.carsharing.dto.user.auth.UserLoginRequest;
+import jlrs.carsharing.dto.user.auth.UserLoginResponse;
+import jlrs.carsharing.dto.user.auth.UserRegistrationRequest;
 import jlrs.carsharing.exception.RegistrationException;
 import jlrs.carsharing.exception.RoleNotFoundException;
 import jlrs.carsharing.mapper.UserMapper;
@@ -38,7 +38,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         returns: {TOKEN}
      */
     @Override
-    public UserLoginResponseDto authenticate(UserLoginRequestDto loginRequest) {
+    public UserLoginResponse authenticate(UserLoginRequest loginRequest) {
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -47,7 +47,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         String token = jwtUtil.generateToken(authentication.getName());
-        return new UserLoginResponseDto(token);
+        return new UserLoginResponse(token);
     }
 
     /*
@@ -56,7 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         returns: {EMAIL}, {FIRST_NAME}, {LAST_NAME}
     */
     @Override
-    public UserResponseDto register(UserRegistrationRequestDto registrationRequest)
+    public UserResponse register(UserRegistrationRequest registrationRequest)
             throws RegistrationException {
         if (userRepository.existsByEmail(registrationRequest.getEmail())) {
             throw new RegistrationException("User with email "

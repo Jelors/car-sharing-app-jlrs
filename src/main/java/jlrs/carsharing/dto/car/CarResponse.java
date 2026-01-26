@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CarDto {
+public class CarResponse {
     private Long id;
     private String model;
     private String brand;

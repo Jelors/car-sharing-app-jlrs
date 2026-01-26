@@ -2,10 +2,10 @@ package jlrs.carsharing.service.impl.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.Set;
-import jlrs.carsharing.dto.user.UserResponseDto;
-import jlrs.carsharing.dto.user.profile.UpdatePasswordRequestDto;
-import jlrs.carsharing.dto.user.profile.UpdateProfileRequestDto;
-import jlrs.carsharing.dto.user.profile.UpdateUserRoleRequestDto;
+import jlrs.carsharing.dto.user.UserResponse;
+import jlrs.carsharing.dto.user.profile.UpdatePasswordRequest;
+import jlrs.carsharing.dto.user.profile.UpdateProfileRequest;
+import jlrs.carsharing.dto.user.profile.UpdateUserRoleRequest;
 import jlrs.carsharing.mapper.UserMapper;
 import jlrs.carsharing.model.User;
 import jlrs.carsharing.repository.UserRepository;
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
         return's info about user: {EMAIL}, {FIRST_NAME}, {LAST_NAME}
     */
     @Override
-    public UserResponseDto getProfileInfo() {
+    public UserResponse getProfileInfo() {
         String email = userDetailsService.getCurrentUserEmail();
         return userRepository.findByEmail(email)
                 .map(userMapper::toUserResponse)
@@ -41,9 +41,9 @@ public class UserServiceImpl implements UserService {
         returns: {EMAIL}, {FIRST_NAME}, {LAST_NAME}
      */
     @Override
-    public UserResponseDto updateUserRole(
+    public UserResponse updateUserRole(
             Long id,
-            UpdateUserRoleRequestDto updateRequest
+            UpdateUserRoleRequest updateRequest
     ) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
         returns: {EMAIL}, {FIRST_NAME}, {LAST_NAME}
      */
     @Override
-    public UserResponseDto updateUserProfile(UpdateProfileRequestDto updateProfileRequest) {
+    public UserResponse updateUserProfile(UpdateProfileRequest updateProfileRequest) {
         User user = userDetailsService.getCurrentUser();
         user.setFirstName(updateProfileRequest.getFirstName());
         user.setLastName(updateProfileRequest.getLastName());
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
         returns: {EMAIL}, {FIRST_NAME}, {LAST_NAME}
      */
     @Override
-    public UserResponseDto updateUserPassword(UpdatePasswordRequestDto updatePasswordRequest) {
+    public UserResponse updateUserPassword(UpdatePasswordRequest updatePasswordRequest) {
         User user = userDetailsService.getCurrentUser();
         user.setPassword(passwordEncoder.encode(updatePasswordRequest.getPassword()));
         return userMapper.toUserResponse(userRepository.save(user));

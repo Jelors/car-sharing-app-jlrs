@@ -1,16 +1,16 @@
 package jlrs.carsharing.service;
 
-import jlrs.carsharing.dto.user.UserResponseDto;
-import jlrs.carsharing.dto.user.profile.UpdatePasswordRequestDto;
-import jlrs.carsharing.dto.user.profile.UpdateProfileRequestDto;
-import jlrs.carsharing.dto.user.profile.UpdateUserRoleRequestDto;
+import jlrs.carsharing.dto.user.UserResponse;
+import jlrs.carsharing.dto.user.profile.UpdatePasswordRequest;
+import jlrs.carsharing.dto.user.profile.UpdateProfileRequest;
+import jlrs.carsharing.dto.user.profile.UpdateUserRoleRequest;
 
 public interface UserService {
-    UserResponseDto getProfileInfo();
+    UserResponse getProfileInfo();
 
-    UserResponseDto updateUserRole(Long userId, UpdateUserRoleRequestDto updateRequest);
+    UserResponse updateUserRole(Long userId, UpdateUserRoleRequest updateRequest);
 
-    UserResponseDto updateUserProfile(UpdateProfileRequestDto updateProfileRequest);
+    UserResponse updateUserProfile(UpdateProfileRequest updateProfileRequest);
 
-    UserResponseDto updateUserPassword(UpdatePasswordRequestDto updatePasswordRequest);
+    UserResponse updateUserPassword(UpdatePasswordRequest updatePasswordRequest);
 }

@@ -3,8 +3,8 @@ package jlrs.carsharing.service.impl.rental;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
-import jlrs.carsharing.dto.rental.CreateRentalRequestDto;
-import jlrs.carsharing.dto.rental.RentalDto;
+import jlrs.carsharing.dto.rental.CreateRentalRequest;
+import jlrs.carsharing.dto.rental.RentalResponse;
 import jlrs.carsharing.mapper.RentalMapper;
 import jlrs.carsharing.model.Car;
 import jlrs.carsharing.model.Rental;
@@ -24,7 +24,7 @@ public class RentalServiceImpl implements RentalService {
     private final UserDetailsServiceImpl userDetailsService;
 
     @Override
-    public RentalDto addRental(CreateRentalRequestDto createRentalRequest) {
+    public RentalResponse addRental(CreateRentalRequest createRentalRequest) {
         Long carId = createRentalRequest.getCarId();
 
         Car car = carRepository.findById(carId)
@@ -45,7 +45,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public RentalDto addActualReturnDate(Long rentalId) {
+    public RentalResponse addActualReturnDate(Long rentalId) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Rental with ID: {" + rentalId + "} not found!"
@@ -66,7 +66,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public RentalDto getRental(Long id) {
+    public RentalResponse getRental(Long id) {
         Rental rental = rentalRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Rental with ID: {" + id + "} not found!"
@@ -75,7 +75,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public List<RentalDto> getRentalsByUserIdAndIsActive(Long id, boolean active) {
+    public List<RentalResponse> getRentalsByUserIdAndIsActive(Long id, boolean active) {
         return rentalRepository.findAllByUserIdAndActive(id, active)
                 .stream()
                 .map(rentalMapper::toDto)

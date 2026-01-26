@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RentalDto {
+public class RentalResponse {
     private LocalDate rentalDate;
     private LocalDate returnDate;
     private LocalDate actualReturnDate;

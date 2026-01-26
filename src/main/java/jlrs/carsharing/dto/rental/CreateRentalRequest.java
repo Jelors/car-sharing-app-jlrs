@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateRentalRequestDto {
+public class CreateRentalRequest {
     private LocalDate returnDate;
     private Long carId;
 }

@@ -17,7 +17,7 @@ import lombok.Setter;
                 message = "Password do not match!"
         )
 })
-public class UserRegistrationRequestDto {
+public class UserRegistrationRequest {
     @NotBlank
     @Email
     private String email;
