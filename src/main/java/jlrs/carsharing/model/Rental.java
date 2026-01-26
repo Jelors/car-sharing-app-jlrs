@@ -17,7 +17,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "rentals")
-@SQLDelete(sql = "UPDATE rental SET is_deleted = true WHERE id=?")
+@SQLDelete(sql = "UPDATE rentals SET is_deleted = true WHERE id=?")
 @SQLRestriction("is_deleted = false")
 @Getter
 @Setter
@@ -37,15 +37,15 @@ public class Rental {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "car_id", nullable = false)
-    private Long carId;
+    private Car car;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
+    private User user;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    private boolean active = true;
 
     @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted = false;
+    private boolean deleted = false;
 }

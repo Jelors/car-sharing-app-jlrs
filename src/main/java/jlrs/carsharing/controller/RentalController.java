@@ -71,8 +71,8 @@ public class RentalController {
     @PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER')")
     @Operation(
             summary = "Endpoint that returns rentals list",
-            description = "Endpoint that returns rentals list" +
-                    " and can be specified by {USER_ID} and {IS_ACTIVE}"
+            description = "Endpoint that returns rentals list"
+                    + " and can be specified by {USER_ID} and {IS_ACTIVE}"
     )
     public ResponseEntity<List<RentalDto>> getRentals(
             @RequestParam(name = "user_id", required = false) Long userId,

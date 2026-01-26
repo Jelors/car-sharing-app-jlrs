@@ -71,7 +71,7 @@ public class CarServiceImpl implements CarService {
         if (amount < 0) {
             throw new IllegalArgumentException("Amount can't be less than 0!");
         }
-        car.setInventory(amount);
+        car.setInventory(car.getInventory() + amount);
         carRepository.save(car);
     }
 

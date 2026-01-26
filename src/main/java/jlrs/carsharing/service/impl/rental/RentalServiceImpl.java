@@ -25,16 +25,19 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     public RentalDto addRental(CreateRentalRequestDto createRentalRequest) {
+        Long carId = createRentalRequest.getCarId();
+
+        Car car = carRepository.findById(carId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Can't find car with ID: {" + carId + "}"
+                ));
+
         Rental rental = new Rental();
         rental.setRentalDate(LocalDate.now());
         rental.setReturnDate(createRentalRequest.getReturnDate());
-        rental.setCarId(createRentalRequest.getCarId());
-        rental.setUserId(userDetailsService.getCurrentUser());
+        rental.setCar(car);
+        rental.setUser(userDetailsService.getCurrentUser());
 
-        Car car = carRepository.findById(rental.getCarId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Can't find car with ID: {" + rental.getCarId() + "}"
-                ));
         car.setInventory(car.getInventory() - 1);
         carRepository.save(car);
 
@@ -50,9 +53,11 @@ public class RentalServiceImpl implements RentalService {
         rental.setActualReturnDate(LocalDate.now());
         rental.setActive(false);
 
-        Car car = carRepository.findById(rental.getCarId())
+        Long carId = rental.getCar().getId();
+
+        Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Can't find car with ID: {" + rental.getCarId() + "}"
+                        "Can't find car with ID: {" + carId + "}"
                 ));
         car.setInventory(car.getInventory() + 1);
         carRepository.save(car);
@@ -70,8 +75,8 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public List<RentalDto> getRentalsByUserIdAndIsActive(Long id, boolean isActive) {
-        return rentalRepository.findAllByUserIdAndIsActive(id, isActive)
+    public List<RentalDto> getRentalsByUserIdAndIsActive(Long id, boolean active) {
+        return rentalRepository.findAllByUserIdAndActive(id, active)
                 .stream()
                 .map(rentalMapper::toDto)
                 .toList();
