@@ -30,13 +30,14 @@ public class PaymentServiceImpl implements PaymentService {
     private final RentalRepository rentalRepository;
     private final PaymentMapper paymentMapper;
 
-    @Value("${stripe.success-url}")
+    @Value("${stripe.success-url:http://localhost:8080/payments/success}")
     private String successUrl;
 
-    @Value("${stripe.cancel-url}")
+    @Value("${stripe.cancel-url:http://localhost:8080/payments/cancel}")
     private String cancelUrl;
 
-    @Value("${stripe.webhook-secret}")
+    @Value("${stripe.webhook-secret:"
+            + "whsec_3be40a61172ef40cc14b69c2e09361fcdcc36fdb6b4455f2c289721c8991e60e}")
     private String endpointSecret;
 
     @Override
