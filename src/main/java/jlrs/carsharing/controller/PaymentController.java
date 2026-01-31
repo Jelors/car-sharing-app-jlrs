@@ -1,5 +1,6 @@
 package jlrs.carsharing.controller;
 
+import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import java.util.List;
 import jlrs.carsharing.dto.payment.PaymentResponse;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,6 +54,12 @@ public class PaymentController {
         return ResponseEntity.ok("Payment cancelled");
     }
 
-
-
+    @PostMapping("/webhook")
+    public ResponseEntity<String> handleWebhook(
+            @RequestBody String payload,
+            @RequestHeader("Stripe-Signature") String sigHeader
+    ) throws SignatureVerificationException {
+        paymentService.process(payload, sigHeader);
+        return ResponseEntity.ok().build();
+    }
 }

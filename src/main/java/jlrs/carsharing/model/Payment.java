@@ -15,12 +15,10 @@ import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "payments")
 @SQLDelete(sql = "UPDATE payments SET is_deleted = true WHERE id=?")
-@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 public class Payment {

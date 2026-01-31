@@ -1,5 +1,6 @@
 package jlrs.carsharing.service;
 
+import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import java.util.List;
 import jlrs.carsharing.dto.payment.PaymentResponse;
@@ -12,4 +13,6 @@ public interface PaymentService {
     PaymentResponse getPaymentBySessionId(String sessionId);
 
     String checkPaymentSuccess(String sessionId) throws StripeException;
+
+    void process(String payload, String sigHeader) throws SignatureVerificationException;
 }

@@ -1,9 +1,13 @@
 package jlrs.carsharing.service.payment;
 
+import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
+import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.temporal.ChronoUnit;
@@ -31,6 +35,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Value("${stripe.cancel-url}")
     private String cancelUrl;
+
+    @Value("${stripe.webhook-secret}")
+    private String endpointSecret;
 
     @Override
     public PaymentResponse createPayment(Long rentalId) throws StripeException {
@@ -108,6 +115,29 @@ public class PaymentServiceImpl implements PaymentService {
 
         return "Payment failed.";
     }
+
+    @Override
+    @Transactional
+    public void process(String payload, String sigHeader) throws SignatureVerificationException {
+        Event event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+
+        if ("checkout.session.completed".equals(event.getType())) {
+            Session session = (Session) event
+                    .getDataObjectDeserializer()
+                    .getObject()
+                    .orElseThrow();
+
+            Payment payment = paymentRepository
+                    .findBySessionId(session.getId())
+                    .orElseThrow();
+
+            if (payment.getStatus() != Payment.Status.PAID) {
+                payment.setStatus(Payment.Status.PAID);
+            }
+        }
+    }
+
+
 
     private BigDecimal calculateTotal(Rental rental) {
         long days = ChronoUnit.DAYS.between(rental.getRentalDate(), rental.getReturnDate());
