@@ -1,17 +1,22 @@
 package jlrs.carsharing.service.payment;
 
 import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.temporal.ChronoUnit;
-import java.util.Map;
+import java.util.List;
+import jlrs.carsharing.dto.payment.PaymentResponse;
+import jlrs.carsharing.mapper.PaymentMapper;
 import jlrs.carsharing.model.Payment;
 import jlrs.carsharing.model.Rental;
 import jlrs.carsharing.repository.PaymentRepository;
 import jlrs.carsharing.repository.RentalRepository;
 import jlrs.carsharing.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,37 +24,89 @@ import org.springframework.stereotype.Service;
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final RentalRepository rentalRepository;
+    private final PaymentMapper paymentMapper;
+
+    @Value("${stripe.success-url}")
+    private String successUrl;
+
+    @Value("${stripe.cancel-url}")
+    private String cancelUrl;
 
     @Override
-    public PaymentIntent createPayment(Long rentalId) throws StripeException {
+    public PaymentResponse createPayment(Long rentalId) throws StripeException {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Rental with ID: {" + rentalId + "} not found!"));
+                        "Rental with ID: {" + rentalId + "} not found!"
+                ));
+
+        BigDecimal total = calculateTotal(rental);
+
+        SessionCreateParams params =
+                SessionCreateParams.builder()
+                        .setMode(SessionCreateParams.Mode.PAYMENT)
+                        .setSuccessUrl(successUrl + "?session_id={CHECKOUT_SESSION_ID}")
+                        .setCancelUrl(cancelUrl)
+                        .addLineItem(
+                                SessionCreateParams.LineItem.builder()
+                                        .setQuantity(1L)
+                                        .setPriceData(
+                                                SessionCreateParams.LineItem.PriceData.builder()
+                                                        .setCurrency("usd")
+                                                        .setUnitAmount(total.multiply(BigDecimal.valueOf(100)).longValue())
+                                                        .setProductData(
+                                                                SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                                        .setName("Car rental payment")
+                                                                        .build()
+                                                        ).build()
+                                        )
+                                        .build()
+                        )
+                        .build();
+
+        Session session = Session.create(params);
 
         Payment payment = new Payment();
         payment.setRental(rental);
-        payment.setTotal(calculateTotal(rental));
+        payment.setSessionId(session.getId());
+        payment.setSessionUrl(session.getUrl());
+        payment.setTotal(total);
         payment.setStatus(Payment.Status.PENDING);
         payment.setType(Payment.Type.PAYMENT);
 
-        paymentRepository.save(payment);
+        return paymentMapper.toDto(paymentRepository.save(payment));
+    }
 
-        PaymentIntent intent = PaymentIntent.create(
-                Map.of(
-                        "amount", payment.getTotal()
-                                .multiply(BigDecimal.valueOf(100))
-                                .longValue(),
-                        "currency", "usd",
-                        "metadata", Map.of(
-                                "paymentId", payment.getId().toString()
-                        )
-                )
-        );
+    @Override
+    public List<PaymentResponse> getAllRentals(Long userId) {
+        return paymentRepository.findAllByRental_User_Id(userId)
+                .stream()
+                .map(paymentMapper::toDto)
+                .toList();
+    }
 
-        payment.setSessionId(intent.getId());
-        paymentRepository.save(payment);
+    @Override
+    public PaymentResponse getPaymentBySessionId(String sessionId) {
+        Payment payment = paymentRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Session with ID: {" + sessionId + "} not found!"
+                ));
+        return paymentMapper.toDto(payment);
+    }
 
-        return intent;
+    @Override
+    public String checkPaymentSuccess(String sessionId) throws StripeException {
+        Session session = Session.retrieve(sessionId);
+
+        PaymentResponse payment = getPaymentBySessionId(sessionId);
+
+        if ("paid".equals(session.getPaymentStatus())) {
+            payment.setStatus(Payment.Status.PAID);
+            Payment paymentModel = paymentMapper.toModel(payment);
+            paymentRepository.save(paymentModel);
+            return "Payment success";
+        }
+
+        return "Payment failed.";
     }
 
     private BigDecimal calculateTotal(Rental rental) {

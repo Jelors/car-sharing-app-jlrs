@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RentalResponse {
+    private Long id;
     private LocalDate rentalDate;
     private LocalDate returnDate;
     private LocalDate actualReturnDate;

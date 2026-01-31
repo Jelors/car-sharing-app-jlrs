@@ -14,8 +14,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class PaymentResponse {
+    private Long id;
     private Long rentalId;
     private BigDecimal total;
     private Payment.Status status;
     private Payment.Type type;
+    private String sessionUrl;
+    private String sessionId;
 }

@@ -14,7 +14,6 @@ import org.mapstruct.Mapping;
         imports = LocalDate.class
 )
 public interface RentalMapper {
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "rentalDate", expression = "java(LocalDate.now())")
     @Mapping(target = "actualReturnDate", ignore = true)
     @Mapping(target = "active", constant = "true")
