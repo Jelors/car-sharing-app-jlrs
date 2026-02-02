@@ -187,6 +187,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- NOTIFICATION SERVICE -->
+        <dependency>
+            <groupId>com.github.pengrad</groupId>
+            <artifactId>java-telegram-bot-api</artifactId>
+            <version>9.3.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
