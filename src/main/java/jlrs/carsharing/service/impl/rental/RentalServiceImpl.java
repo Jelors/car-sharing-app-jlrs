@@ -1,7 +1,10 @@
 package jlrs.carsharing.service.impl.rental;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import jlrs.carsharing.dto.rental.CreateRentalRequest;
 import jlrs.carsharing.dto.rental.RentalResponse;
@@ -80,5 +83,24 @@ public class RentalServiceImpl implements RentalService {
                 .stream()
                 .map(rentalMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    public BigDecimal calculateTotal(Rental rental) {
+        long days = ChronoUnit.DAYS.between(rental.getRentalDate(), rental.getReturnDate());
+        if (days <= 1) {
+            days = 1;
+        }
+
+        BigDecimal baseAmount = rental.getCar().getDailyFee().multiply(BigDecimal.valueOf(days));
+
+        BigDecimal fines = BigDecimal.ZERO;
+        if (rental.getActualReturnDate() != null &&
+                rental.getActualReturnDate().isAfter(rental.getRentalDate())) {
+            long lateDays = ChronoUnit.DAYS.between(rental.getReturnDate(), rental.getActualReturnDate());
+            fines = rental.getCar().getDailyFee().multiply(BigDecimal.valueOf(lateDays)).multiply(BigDecimal.valueOf(1.4)); // 40% fine
+        }
+
+        return baseAmount.add(fines).setScale(2, RoundingMode.HALF_UP);
     }
 }

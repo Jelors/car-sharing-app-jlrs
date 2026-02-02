@@ -15,10 +15,12 @@ import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "payments")
 @SQLDelete(sql = "UPDATE payments SET is_deleted = true WHERE id=?")
+@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 public class Payment {
@@ -33,7 +35,7 @@ public class Payment {
     @Column(name = "session_url", nullable = false, length = 2048)
     private String sessionUrl; // URL for the payment session with a payment provider
 
-    @Column(name = "session_id", nullable = false)
+    @Column(name = "session_id", nullable = false, unique = true)
     private String sessionId; // ID of the payment session
 
     @Column(nullable = false)

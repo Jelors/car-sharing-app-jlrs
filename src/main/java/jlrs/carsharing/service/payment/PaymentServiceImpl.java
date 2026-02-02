@@ -9,9 +9,8 @@ import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
+import jlrs.carsharing.dto.payment.CheckoutResponseDto;
 import jlrs.carsharing.dto.payment.PaymentResponse;
 import jlrs.carsharing.mapper.PaymentMapper;
 import jlrs.carsharing.model.Payment;
@@ -19,6 +18,7 @@ import jlrs.carsharing.model.Rental;
 import jlrs.carsharing.repository.PaymentRepository;
 import jlrs.carsharing.repository.RentalRepository;
 import jlrs.carsharing.service.PaymentService;
+import jlrs.carsharing.service.RentalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
+    private final RentalService rentalService;
     private final PaymentRepository paymentRepository;
     private final RentalRepository rentalRepository;
     private final PaymentMapper paymentMapper;
@@ -41,47 +42,42 @@ public class PaymentServiceImpl implements PaymentService {
     private String endpointSecret;
 
     @Override
-    public PaymentResponse createPayment(Long rentalId) throws StripeException {
-        Rental rental = rentalRepository.findById(rentalId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Rental with ID: {" + rentalId + "} not found!"
-                ));
-
-        BigDecimal total = calculateTotal(rental);
-
-        SessionCreateParams params =
-                SessionCreateParams.builder()
-                        .setMode(SessionCreateParams.Mode.PAYMENT)
-                        .setSuccessUrl(successUrl + "?session_id={CHECKOUT_SESSION_ID}")
-                        .setCancelUrl(cancelUrl)
-                        .addLineItem(
-                                SessionCreateParams.LineItem.builder()
-                                        .setQuantity(1L)
-                                        .setPriceData(
-                                                SessionCreateParams.LineItem.PriceData.builder()
-                                                        .setCurrency("usd")
-                                                        .setUnitAmount(total.multiply(BigDecimal.valueOf(100)).longValue())
-                                                        .setProductData(
-                                                                SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                        .setName("Car rental payment")
-                                                                        .build()
-                                                        ).build()
-                                        )
-                                        .build()
-                        )
-                        .build();
-
-        Session session = Session.create(params);
-
+    @Transactional
+    public PaymentResponse createPendingPayment(
+            Rental rental,
+            Session session,
+            BigDecimal total
+    ) {
         Payment payment = new Payment();
         payment.setRental(rental);
+        payment.setTotal(total);
         payment.setSessionId(session.getId());
         payment.setSessionUrl(session.getUrl());
-        payment.setTotal(total);
-        payment.setStatus(Payment.Status.PENDING);
         payment.setType(Payment.Type.PAYMENT);
+        payment.setStatus(Payment.Status.PENDING);
 
         return paymentMapper.toDto(paymentRepository.save(payment));
+    }
+
+    @Override
+    @Transactional
+    public void markPaymentAsPaid(String sessionId) {
+        Payment payment = paymentRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new RuntimeException(
+                        "Payment not found for session: " + sessionId
+                ));
+
+        if (payment.getStatus() == Payment.Status.PAID) {
+            throw new RuntimeException("Payment already PAID");
+        }
+
+        payment.setStatus(Payment.Status.PAID);
+
+        Rental rental = payment.getRental();
+        rental.setActive(false);
+
+        paymentRepository.save(payment);
+        rentalRepository.save(rental);
     }
 
     @Override
@@ -102,59 +98,56 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public String checkPaymentSuccess(String sessionId) throws StripeException {
-        Session session = Session.retrieve(sessionId);
-
-        PaymentResponse payment = getPaymentBySessionId(sessionId);
-
-        if ("paid".equals(session.getPaymentStatus())) {
-            payment.setStatus(Payment.Status.PAID);
-            Payment paymentModel = paymentMapper.toModel(payment);
-            paymentRepository.save(paymentModel);
-            return "Payment success";
+    @Transactional
+    public void handleWebhook(String payload, String sigHeader) {
+        Event event;
+        try {
+            event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+        } catch (SignatureVerificationException e) {
+            throw new RuntimeException("Invalid Stripe signature");
         }
 
-        return "Payment failed.";
-    }
-
-    @Override
-    @Transactional
-    public void process(String payload, String sigHeader) throws SignatureVerificationException {
-        Event event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
-
         if ("checkout.session.completed".equals(event.getType())) {
-            Session session = (Session) event
-                    .getDataObjectDeserializer()
+            Session session = (Session) event.getDataObjectDeserializer()
                     .getObject()
                     .orElseThrow();
 
-            Payment payment = paymentRepository
-                    .findBySessionId(session.getId())
-                    .orElseThrow();
-
-            if (payment.getStatus() != Payment.Status.PAID) {
-                payment.setStatus(Payment.Status.PAID);
-            }
+            markPaymentAsPaid(session.getId());
         }
     }
 
+    @Override
+    public CheckoutResponseDto createCheckout(Long rentalId) throws StripeException {
+        Rental rental = rentalRepository.findById(rentalId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Rental with ID: {" + rentalId + "} not found!"
+                ));
+        BigDecimal total = rentalService.calculateTotal(rental);
 
+        SessionCreateParams params =
+                SessionCreateParams.builder()
+                        .setMode(SessionCreateParams.Mode.PAYMENT)
+                        .setSuccessUrl(successUrl)
+                        .setCancelUrl(cancelUrl)
+                        .addLineItem(
+                                SessionCreateParams.LineItem.builder()
+                                        .setQuantity(1L)
+                                        .setPriceData(
+                                                SessionCreateParams.LineItem.PriceData.builder()
+                                                        .setCurrency("usd")
+                                                        .setUnitAmount(total.multiply(BigDecimal.valueOf(100)).longValue())
+                                                        .setProductData(
+                                                                SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                                        .setName("Car rental #" + rental.getId())
+                                                                        .build()
+                                                        ).build()
+                                        ).build()
+                        ).build();
 
-    private BigDecimal calculateTotal(Rental rental) {
-        long days = ChronoUnit.DAYS.between(rental.getRentalDate(), rental.getReturnDate());
-        if (days <= 1) {
-            days = 1;
-        }
+        Session session = Session.create(params);
 
-        BigDecimal baseAmount = rental.getCar().getDailyFee().multiply(BigDecimal.valueOf(days));
+        createPendingPayment(rental, session, total);
 
-        BigDecimal fines = BigDecimal.ZERO;
-        if (rental.getActualReturnDate() != null &&
-                rental.getActualReturnDate().isAfter(rental.getRentalDate())) {
-            long lateDays = ChronoUnit.DAYS.between(rental.getReturnDate(), rental.getActualReturnDate());
-            fines = rental.getCar().getDailyFee().multiply(BigDecimal.valueOf(lateDays)).multiply(BigDecimal.valueOf(1.4)); // 40% fine
-        }
-
-        return baseAmount.add(fines).setScale(2, RoundingMode.HALF_UP);
+        return new CheckoutResponseDto(session.getUrl());
     }
 }

@@ -28,9 +28,10 @@ databaseChangeLog:
 
               - column:
                   name: session_id
-                  type: varchar(1024)
+                  type: varchar(255)
                   constraints:
                     nullable: false
+                    unique: true
 
               - column:
                   name: total
