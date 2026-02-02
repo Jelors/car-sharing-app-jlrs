@@ -1,10 +1,13 @@
 package jlrs.carsharing.service.impl.rental;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import jlrs.carsharing.dto.rental.CreateRentalRequestDto;
-import jlrs.carsharing.dto.rental.RentalDto;
+import jlrs.carsharing.dto.rental.CreateRentalRequest;
+import jlrs.carsharing.dto.rental.RentalResponse;
 import jlrs.carsharing.mapper.RentalMapper;
 import jlrs.carsharing.model.Car;
 import jlrs.carsharing.model.Rental;
@@ -24,7 +27,7 @@ public class RentalServiceImpl implements RentalService {
     private final UserDetailsServiceImpl userDetailsService;
 
     @Override
-    public RentalDto addRental(CreateRentalRequestDto createRentalRequest) {
+    public RentalResponse addRental(CreateRentalRequest createRentalRequest) {
         Long carId = createRentalRequest.getCarId();
 
         Car car = carRepository.findById(carId)
@@ -45,7 +48,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public RentalDto addActualReturnDate(Long rentalId) {
+    public RentalResponse addActualReturnDate(Long rentalId) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Rental with ID: {" + rentalId + "} not found!"
@@ -66,7 +69,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public RentalDto getRental(Long id) {
+    public RentalResponse getRental(Long id) {
         Rental rental = rentalRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Rental with ID: {" + id + "} not found!"
@@ -75,10 +78,29 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public List<RentalDto> getRentalsByUserIdAndIsActive(Long id, boolean active) {
+    public List<RentalResponse> getRentalsByUserIdAndIsActive(Long id, boolean active) {
         return rentalRepository.findAllByUserIdAndActive(id, active)
                 .stream()
                 .map(rentalMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    public BigDecimal calculateTotal(Rental rental) {
+        long days = ChronoUnit.DAYS.between(rental.getRentalDate(), rental.getReturnDate());
+        if (days <= 1) {
+            days = 1;
+        }
+
+        BigDecimal baseAmount = rental.getCar().getDailyFee().multiply(BigDecimal.valueOf(days));
+
+        BigDecimal fines = BigDecimal.ZERO;
+        if (rental.getActualReturnDate() != null &&
+                rental.getActualReturnDate().isAfter(rental.getRentalDate())) {
+            long lateDays = ChronoUnit.DAYS.between(rental.getReturnDate(), rental.getActualReturnDate());
+            fines = rental.getCar().getDailyFee().multiply(BigDecimal.valueOf(lateDays)).multiply(BigDecimal.valueOf(1.4)); // 40% fine
+        }
+
+        return baseAmount.add(fines).setScale(2, RoundingMode.HALF_UP);
     }
 }

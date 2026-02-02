@@ -3,10 +3,10 @@ package jlrs.carsharing.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jlrs.carsharing.dto.user.UserResponseDto;
-import jlrs.carsharing.dto.user.profile.UpdatePasswordRequestDto;
-import jlrs.carsharing.dto.user.profile.UpdateProfileRequestDto;
-import jlrs.carsharing.dto.user.profile.UpdateUserRoleRequestDto;
+import jlrs.carsharing.dto.user.UserResponse;
+import jlrs.carsharing.dto.user.profile.UpdatePasswordRequest;
+import jlrs.carsharing.dto.user.profile.UpdateProfileRequest;
+import jlrs.carsharing.dto.user.profile.UpdateUserRoleRequest;
 import jlrs.carsharing.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ public class UsersController {
             summary = "Get profile info",
             description = "Receive profile info about current logged user"
     )
-    public ResponseEntity<UserResponseDto> receiveProfileInfo() {
+    public ResponseEntity<UserResponse> receiveProfileInfo() {
         return new ResponseEntity<>(
                 userService.getProfileInfo(),
                 HttpStatus.OK
@@ -45,9 +45,9 @@ public class UsersController {
             summary = "Update user role",
             description = "Updates user role"
     )
-    public ResponseEntity<UserResponseDto> updateUserRole(
+    public ResponseEntity<UserResponse> updateUserRole(
             @PathVariable Long id,
-            @RequestBody @Valid UpdateUserRoleRequestDto roleRequestDto
+            @RequestBody @Valid UpdateUserRoleRequest roleRequestDto
     ) {
         return new ResponseEntity<>(
                 userService.updateUserRole(id, roleRequestDto),
@@ -61,8 +61,8 @@ public class UsersController {
             summary = "Update profile",
             description = "Updates profile current logged user"
     )
-    public ResponseEntity<UserResponseDto> updateProfileInfo(
-            @RequestBody @Valid UpdateProfileRequestDto profileRequestDto
+    public ResponseEntity<UserResponse> updateProfileInfo(
+            @RequestBody @Valid UpdateProfileRequest profileRequestDto
     ) {
         return new ResponseEntity<>(
                 userService.updateUserProfile(profileRequestDto),
@@ -76,8 +76,8 @@ public class UsersController {
             summary = "Update password",
             description = "Updates password current logged user"
     )
-    public ResponseEntity<UserResponseDto> updatePassword(
-            @RequestBody @Valid UpdatePasswordRequestDto passwordRequestDto
+    public ResponseEntity<UserResponse> updatePassword(
+            @RequestBody @Valid UpdatePasswordRequest passwordRequestDto
     ) {
         return new ResponseEntity<>(
                 userService.updateUserPassword(passwordRequestDto),

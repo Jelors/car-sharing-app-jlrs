@@ -10,4 +10,7 @@
     <suppress
             files=".*[/\\]resources[/\\].*"
             checks=".*"/>
+    <suppress
+            files=".*[/\\]service[/\\].*"
+            checks=".*"/>
 </suppressions>

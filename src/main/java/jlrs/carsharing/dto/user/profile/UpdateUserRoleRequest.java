@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UpdateUserRoleRequestDto {
+public class UpdateUserRoleRequest {
     @Status(enumClass = UserRole.RoleName.class)
     private UserRole role;
 }

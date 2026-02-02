@@ -4,7 +4,7 @@ databaseChangeLog:
       author: jelors
       changes:
         - createTable:
-            tableName: payment
+            tableName: payments
             columns:
               - column:
                   name: id
@@ -28,13 +28,26 @@ databaseChangeLog:
 
               - column:
                   name: session_id
-                  type: bigint
+                  type: varchar(255)
                   constraints:
                     nullable: false
+                    unique: true
 
               - column:
                   name: total
                   type: decimal
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: varchar(48)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: type
+                  type: varchar(48)
                   constraints:
                     nullable: false
 

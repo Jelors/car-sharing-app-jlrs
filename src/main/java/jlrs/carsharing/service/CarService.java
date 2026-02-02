@@ -1,17 +1,17 @@
 package jlrs.carsharing.service;
 
 import java.util.List;
-import jlrs.carsharing.dto.car.CarDto;
-import jlrs.carsharing.dto.car.CreateCarRequestDto;
+import jlrs.carsharing.dto.car.CarResponse;
+import jlrs.carsharing.dto.car.CreateCarRequest;
 
 public interface CarService {
-    CarDto insertNewCar(CreateCarRequestDto createCarRequest);
+    CarResponse insertNewCar(CreateCarRequest createCarRequest);
 
-    CarDto getCarInformation(Long id);
+    CarResponse getCarInformation(Long id);
 
-    CarDto updateCarInformation(Long id, CreateCarRequestDto updateCarRequest);
+    CarResponse updateCarInformation(Long id, CreateCarRequest updateCarRequest);
 
-    List<CarDto> getAllCars();
+    List<CarResponse> getAllCars();
 
     void deleteCar(Long id);
 

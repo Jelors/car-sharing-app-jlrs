@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
-import jlrs.carsharing.dto.car.CarDto;
-import jlrs.carsharing.dto.car.CreateCarRequestDto;
+import jlrs.carsharing.dto.car.CarResponse;
+import jlrs.carsharing.dto.car.CreateCarRequest;
 import jlrs.carsharing.service.CarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,8 +34,8 @@ public class CarsController {
             summary = "Add new car to DB",
             description = "Insert new car in database"
     )
-    public ResponseEntity<CarDto> insertNewCar(
-            @RequestBody @Valid CreateCarRequestDto createCarRequest
+    public ResponseEntity<CarResponse> insertNewCar(
+            @RequestBody @Valid CreateCarRequest createCarRequest
     ) {
         return new ResponseEntity<>(
                 carService.insertNewCar(createCarRequest),
@@ -49,7 +49,7 @@ public class CarsController {
             summary = "Get information about car",
             description = "Receive detailed information about car"
     )
-    public ResponseEntity<CarDto> getCarInformation(@PathVariable Long id) {
+    public ResponseEntity<CarResponse> getCarInformation(@PathVariable Long id) {
         return new ResponseEntity<>(
                 carService.getCarInformation(id),
                 HttpStatus.OK
@@ -62,7 +62,7 @@ public class CarsController {
             summary = "Get information about all cars",
             description = "Get information about all available cars"
     )
-    public ResponseEntity<List<CarDto>> getAllCars() {
+    public ResponseEntity<List<CarResponse>> getAllCars() {
         return new ResponseEntity<>(
                 carService.getAllCars(),
                 HttpStatus.OK
@@ -75,9 +75,9 @@ public class CarsController {
             summary = "Update car information",
             description = "Updates car information"
     )
-    public ResponseEntity<CarDto> updateCarInformation(
+    public ResponseEntity<CarResponse> updateCarInformation(
             @PathVariable Long id,
-            @RequestBody @Valid CreateCarRequestDto updateCarRequest
+            @RequestBody @Valid CreateCarRequest updateCarRequest
     ) {
         return new ResponseEntity<>(
                 carService.updateCarInformation(id, updateCarRequest),

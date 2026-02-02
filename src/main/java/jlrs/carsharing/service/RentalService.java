@@ -1,15 +1,19 @@
 package jlrs.carsharing.service;
 
+import java.math.BigDecimal;
 import java.util.List;
-import jlrs.carsharing.dto.rental.CreateRentalRequestDto;
-import jlrs.carsharing.dto.rental.RentalDto;
+import jlrs.carsharing.dto.rental.CreateRentalRequest;
+import jlrs.carsharing.dto.rental.RentalResponse;
+import jlrs.carsharing.model.Rental;
 
 public interface RentalService {
-    RentalDto addRental(CreateRentalRequestDto createRentalRequest);
+    RentalResponse addRental(CreateRentalRequest createRentalRequest);
 
-    RentalDto addActualReturnDate(Long rentalId);
+    RentalResponse addActualReturnDate(Long rentalId);
 
-    RentalDto getRental(Long id);
+    RentalResponse getRental(Long id);
 
-    List<RentalDto> getRentalsByUserIdAndIsActive(Long id, boolean isActive);
+    List<RentalResponse> getRentalsByUserIdAndIsActive(Long id, boolean isActive);
+
+    BigDecimal calculateTotal(Rental rental);
 }

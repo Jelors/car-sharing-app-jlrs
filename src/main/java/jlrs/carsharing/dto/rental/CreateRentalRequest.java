@@ -6,10 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RentalDto {
-    private LocalDate rentalDate;
+public class CreateRentalRequest {
     private LocalDate returnDate;
-    private LocalDate actualReturnDate;
     private Long carId;
-    private Long userId;
 }

@@ -2,10 +2,10 @@ package jlrs.carsharing.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jlrs.carsharing.dto.user.UserResponseDto;
-import jlrs.carsharing.dto.user.auth.UserLoginRequestDto;
-import jlrs.carsharing.dto.user.auth.UserLoginResponseDto;
-import jlrs.carsharing.dto.user.auth.UserRegistrationRequestDto;
+import jlrs.carsharing.dto.user.UserResponse;
+import jlrs.carsharing.dto.user.auth.UserLoginRequest;
+import jlrs.carsharing.dto.user.auth.UserLoginResponse;
+import jlrs.carsharing.dto.user.auth.UserRegistrationRequest;
 import jlrs.carsharing.security.auth.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,10 +27,10 @@ public class AuthenticationController {
             summary = "Register a new user",
             description = "Register a new user"
     )
-    public ResponseEntity<UserResponseDto> register(
-            @RequestBody UserRegistrationRequestDto registrationRequest
+    public ResponseEntity<UserResponse> register(
+            @RequestBody UserRegistrationRequest registrationRequest
     ) {
-        return new ResponseEntity<UserResponseDto>(
+        return new ResponseEntity<UserResponse>(
                 authenticationService.register(registrationRequest),
                 HttpStatus.CREATED
         );
@@ -41,10 +41,10 @@ public class AuthenticationController {
             summary = "Authenticate user",
             description = "Authenticate user by email and password"
     )
-    public ResponseEntity<UserLoginResponseDto> login(
-            @RequestBody UserLoginRequestDto loginRequest
+    public ResponseEntity<UserLoginResponse> login(
+            @RequestBody UserLoginRequest loginRequest
     ) {
-        return new ResponseEntity<UserLoginResponseDto>(
+        return new ResponseEntity<UserLoginResponse>(
                 authenticationService.authenticate(loginRequest),
                 HttpStatus.OK
         );

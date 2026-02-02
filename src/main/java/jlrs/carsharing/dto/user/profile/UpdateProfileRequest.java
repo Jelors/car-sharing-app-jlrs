@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UpdateProfileRequestDto {
+public class UpdateProfileRequest {
     @Name
     @NotBlank
     private String firstName;

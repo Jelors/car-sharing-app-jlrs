@@ -15,7 +15,7 @@ import lombok.Setter;
                 message = "Password do not match!"
         )
 })
-public class UpdatePasswordRequestDto {
+public class UpdatePasswordRequest {
     @Password
     @NotBlank
     private String password;

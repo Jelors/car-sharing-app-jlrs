@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateCarRequestDto {
+public class CreateCarRequest {
     private String model;
     private String brand;
     private BigDecimal dailyFee;
