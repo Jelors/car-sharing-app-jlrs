@@ -78,17 +78,18 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public List<RentalResponse> getRentalsByUserIdAndIsActive(Long id, boolean active) {
-        return rentalRepository.findAllByUserIdAndActive(id, active)
-                .stream()
-                .map(rentalMapper::toDto)
-                .toList();
-    }
+    public List<RentalResponse> getRentalsByUserIdAndIsActive(Long id, Boolean active) {
+        List<Rental> rentals;
 
-    @Override
-    public List<RentalResponse> getRentalsByActive(boolean isActive) {
-        return rentalRepository.findAllByActive(isActive)
-                .stream()
+        boolean isActive = (active == null) || active;
+
+        if (id != null) {
+            rentals = rentalRepository.findAllByUserIdAndActive(id, isActive);
+        } else {
+            rentals = rentalRepository.findAllByActive(isActive);
+        }
+
+        return rentals.stream()
                 .map(rentalMapper::toDto)
                 .toList();
     }

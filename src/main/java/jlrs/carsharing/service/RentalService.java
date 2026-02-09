@@ -13,9 +13,8 @@ public interface RentalService {
 
     RentalResponse getRental(Long id);
 
-    List<RentalResponse> getRentalsByUserIdAndIsActive(Long id, boolean isActive);
+    List<RentalResponse> getRentalsByUserIdAndIsActive(Long id, Boolean isActive);
 
-    List<RentalResponse> getRentalsByActive(boolean isActive);
 
     BigDecimal calculateTotal(Rental rental);
 }

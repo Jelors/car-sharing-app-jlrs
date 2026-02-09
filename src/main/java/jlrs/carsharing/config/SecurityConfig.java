@@ -30,7 +30,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(0)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)

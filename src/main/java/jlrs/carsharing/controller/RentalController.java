@@ -84,19 +84,4 @@ public class RentalController {
         );
     }
 
-    @GetMapping
-    @PreAuthorize("hasRole('MANAGER')")
-    @Operation(
-            summary = "Receive all active or not active rentals",
-            description = "Endpoint that returns rentals list"
-                    + " and can be specified by rental's status {IS_ACTIVE}"
-    )
-    public ResponseEntity<List<RentalResponse>> getAllRentals(
-            @RequestParam(name = "is_active", required = false) Boolean isActive
-    ) {
-        return new ResponseEntity<>(
-                rentalService.getRentalsByActive(isActive),
-                HttpStatus.OK
-        );
-    }
 }
