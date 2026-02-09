@@ -6,6 +6,7 @@ import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
@@ -24,22 +25,33 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private final RentalService rentalService;
     private final PaymentRepository paymentRepository;
     private final RentalRepository rentalRepository;
     private final PaymentMapper paymentMapper;
 
-    @Value("${stripe.success-url:http://localhost:8080/payments/success}")
-    private String successUrl;
+    private final String successUrl;
+    private final String cancelUrl;
+    private final String endpointSecret;
 
-    @Value("${stripe.cancel-url:http://localhost:8080/payments/cancel}")
-    private String cancelUrl;
-
-    @Value("${stripe.webhook-secret:"
-            + "whsec_3be40a61172ef40cc14b69c2e09361fcdcc36fdb6b4455f2c289721c8991e60e}")
-    private String endpointSecret;
+    public PaymentServiceImpl(
+            @Value("${stripe.successUrl}") String successUrl,
+            @Value("${stripe.cancelUrl}") String cancelUrl,
+            @Value("${stripe.webhookSecret}") String endpointSecret,
+            PaymentMapper paymentMapper,
+            PaymentRepository paymentRepository,
+            RentalRepository rentalRepository,
+            RentalService rentalService
+    ) {
+        this.cancelUrl = cancelUrl;
+        this.endpointSecret = endpointSecret;
+        this.paymentMapper = paymentMapper;
+        this.paymentRepository = paymentRepository;
+        this.rentalRepository = rentalRepository;
+        this.rentalService = rentalService;
+        this.successUrl = successUrl;
+    }
 
     @Override
     @Transactional

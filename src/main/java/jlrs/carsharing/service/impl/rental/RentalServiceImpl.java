@@ -86,6 +86,14 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    public List<RentalResponse> getRentalsByActive(boolean isActive) {
+        return rentalRepository.findAllByActive(isActive)
+                .stream()
+                .map(rentalMapper::toDto)
+                .toList();
+    }
+
+    @Override
     public BigDecimal calculateTotal(Rental rental) {
         long days = ChronoUnit.DAYS.between(rental.getRentalDate(), rental.getReturnDate());
         if (days <= 1) {

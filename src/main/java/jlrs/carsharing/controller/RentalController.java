@@ -74,12 +74,28 @@ public class RentalController {
             description = "Endpoint that returns rentals list"
                     + " and can be specified by {USER_ID} and {IS_ACTIVE}"
     )
-    public ResponseEntity<List<RentalResponse>> getRentals(
+    public ResponseEntity<List<RentalResponse>> getRentalsByUserId(
             @RequestParam(name = "user_id", required = false) Long userId,
             @RequestParam(name = "is_active", required = false) Boolean isActive
     ) {
         return new ResponseEntity<>(
                 rentalService.getRentalsByUserIdAndIsActive(userId, isActive),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('MANAGER')")
+    @Operation(
+            summary = "Receive all active or not active rentals",
+            description = "Endpoint that returns rentals list"
+                    + " and can be specified by rental's status {IS_ACTIVE}"
+    )
+    public ResponseEntity<List<RentalResponse>> getAllRentals(
+            @RequestParam(name = "is_active", required = false) Boolean isActive
+    ) {
+        return new ResponseEntity<>(
+                rentalService.getRentalsByActive(isActive),
                 HttpStatus.OK
         );
     }
