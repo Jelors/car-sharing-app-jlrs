@@ -18,7 +18,6 @@ public class EnvConfig implements ApplicationContextInitializer<ConfigurableAppl
         Map<String, Object> envMap = new HashMap<>();
         dotenv.entries().forEach(entry -> envMap.put(entry.getKey(), entry.getValue()));
 
-        // Додаємо змінні в самий верх пріоритетів Spring
         environment.getPropertySources().addFirst(new MapPropertySource("dotenvProperties", envMap));
     }
 }

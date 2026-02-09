@@ -2,10 +2,12 @@ package jlrs.carsharing.notification;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import jlrs.carsharing.dto.rental.RentalCreatedEvent;
 import jlrs.carsharing.dto.rental.RentalResponse;
 import jlrs.carsharing.service.RentalService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
@@ -24,15 +26,19 @@ public class CarsharingTelegramBot implements SpringLongPollingBot, LongPollingU
     private final TelegramClient telegramClient;
     private final RentalService rentalService;
     private final String botToken;
+    private final String adminChatId;
 
     private static final String ACTIVE_RENTALS = "active_rentals";
     private static final String NOT_ACTIVE_RENTALS = "notActive_rentals";
 
     public CarsharingTelegramBot(
-            RentalService rentalService, @Value("${telegram.token}") String botToken
+            RentalService rentalService,
+            @Value("${telegram.token}") String botToken,
+            @Value("${telegram.admin.chatId}") String adminChatId
     ) {
         this.rentalService = rentalService;
         this.botToken = botToken;
+        this.adminChatId = adminChatId;
         this.telegramClient = new OkHttpTelegramClient(botToken);
     }
 
@@ -49,6 +55,15 @@ public class CarsharingTelegramBot implements SpringLongPollingBot, LongPollingU
     @Override
     public void consume(List<Update> list) {
         list.forEach(this::handleUpdate);
+    }
+
+    /*
+    when rental will be created, instantly sends notification about this to admin
+     */
+    @EventListener
+    private void handleRentalCreatedEvent(RentalCreatedEvent event) throws TelegramApiException {
+        String message = "🚀 *New Rental Created!*\n\n" + formatSingleRental(event.rental());
+        sendMessage(Long.valueOf(adminChatId), message);
     }
 
     @SneakyThrows
@@ -68,6 +83,9 @@ public class CarsharingTelegramBot implements SpringLongPollingBot, LongPollingU
         }
     }
 
+    /*
+    welcome message. also hosts menu that appear when user types /start
+     */
     private void sendMainMenu(Long chatId) throws TelegramApiException {
         SendMessage message = SendMessage.builder()
                 .text(" Welcome to Carsharing Application Bot."
@@ -100,6 +118,9 @@ public class CarsharingTelegramBot implements SpringLongPollingBot, LongPollingU
 
     }
 
+    /*
+    main method that provides sending messages about current rentals situation
+     */
     private void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
         var data = callbackQuery.getData();
         Long chatId = callbackQuery.getMessage().getChatId();
@@ -120,6 +141,10 @@ public class CarsharingTelegramBot implements SpringLongPollingBot, LongPollingU
         telegramClient.execute(message);
     }
 
+    /*
+    method that returns all rentals that was created.
+    have two statuses: All Active rentals and Rentals that are not active.
+     */
     private String formatRentalsList(Boolean isActive) {
         List<RentalResponse> rentals = rentalService.getRentalsByUserIdAndIsActive(null, isActive);
         String type = (isActive != null && isActive) ? "Active" : "All/Not Active";
@@ -139,16 +164,39 @@ public class CarsharingTelegramBot implements SpringLongPollingBot, LongPollingU
         return stringBuilder.toString();
     }
 
+    /*
+    method returns formatted RentalResponse dto for correct display in telegram
+    if actual return date ain't set yet, returns message without this value
+     */
     private String formatSingleRental(RentalResponse rentalResponse) {
-        return String.format(
-                "🆔 *Rental ID:* %d\n"
-                        + "🚗 *Car ID:* %d\n"
-                        + "\uD83D\uDC64 *User ID:* %d\n"
-                        + "📅 *Actual return date:* %s",
-                rentalResponse.getId(),
-                rentalResponse.getCarId(),
-                rentalResponse.getUserId(),
-                rentalResponse.getRentalDate()
-        );
+        if (rentalResponse.getActualReturnDate() == null) {
+            return String.format(
+                    "🆔 *Rental ID:* %d\n"
+                            + "🚗 *Car ID:* %d\n"
+                            + "\uD83D\uDC64 *User ID:* %d\n"
+                            + "📅 *Rental date:* %s\n"
+                            + "📅 *Return date:* %s\n",
+                    rentalResponse.getId(),
+                    rentalResponse.getCarId(),
+                    rentalResponse.getUserId(),
+                    rentalResponse.getRentalDate(),
+                    rentalResponse.getReturnDate()
+            );
+        } else {
+            return String.format(
+                    "🆔 *Rental ID:* %d\n"
+                            + "🚗 *Car ID:* %d\n"
+                            + "\uD83D\uDC64 *User ID:* %d\n"
+                            + "📅 *Rental date:* %s\n"
+                            + "📅 *Return date:* %s\n"
+                            + "📅 *Actual return date:* %s\n",
+                    rentalResponse.getId(),
+                    rentalResponse.getCarId(),
+                    rentalResponse.getUserId(),
+                    rentalResponse.getRentalDate(),
+                    rentalResponse.getReturnDate(),
+                    rentalResponse.getActualReturnDate()
+            );
+        }
     }
 }

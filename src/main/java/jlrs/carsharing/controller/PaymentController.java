@@ -22,9 +22,21 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @GetMapping
-    public ResponseEntity<List<PaymentResponse>> getPayments(@RequestParam("user_id") Long userId) {
+    public ResponseEntity<List<PaymentResponse>> getPayments(
+            @RequestParam("user_id") Long userId
+    ) {
         return new ResponseEntity<>(
                 paymentService.getAllRentals(userId),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<PaymentResponse> getPaymentBySessionId(
+            @RequestParam("session_id") String sessionId
+    ) {
+        return new ResponseEntity<>(
+                paymentService.getPaymentBySessionId(sessionId),
                 HttpStatus.OK
         );
     }

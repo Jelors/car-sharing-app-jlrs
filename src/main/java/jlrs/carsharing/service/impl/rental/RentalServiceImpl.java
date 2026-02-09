@@ -1,12 +1,14 @@
 package jlrs.carsharing.service.impl.rental;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import jlrs.carsharing.dto.rental.CreateRentalRequest;
+import jlrs.carsharing.dto.rental.RentalCreatedEvent;
 import jlrs.carsharing.dto.rental.RentalResponse;
 import jlrs.carsharing.mapper.RentalMapper;
 import jlrs.carsharing.model.Car;
@@ -16,6 +18,7 @@ import jlrs.carsharing.repository.RentalRepository;
 import jlrs.carsharing.service.RentalService;
 import jlrs.carsharing.service.impl.user.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,8 +28,10 @@ public class RentalServiceImpl implements RentalService {
     private final CarRepository carRepository;
     private final RentalMapper rentalMapper;
     private final UserDetailsServiceImpl userDetailsService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional
     public RentalResponse addRental(CreateRentalRequest createRentalRequest) {
         Long carId = createRentalRequest.getCarId();
 
@@ -34,6 +39,12 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find car with ID: {" + carId + "}"
                 ));
+
+        if (car.getInventory() <= 0) {
+            throw new IllegalArgumentException(
+                    "You can't take car that ain't available in our inventory!"
+            );
+        }
 
         Rental rental = new Rental();
         rental.setRentalDate(LocalDate.now());
@@ -44,15 +55,23 @@ public class RentalServiceImpl implements RentalService {
         car.setInventory(car.getInventory() - 1);
         carRepository.save(car);
 
-        return rentalMapper.toDto(rentalRepository.save(rental));
+        RentalResponse rentalResponse = rentalMapper.toDto(rentalRepository.save(rental));
+        eventPublisher.publishEvent(new RentalCreatedEvent(rentalResponse)); // sends notification about new rental to TG bot
+        return rentalResponse;
     }
 
     @Override
+    @Transactional
     public RentalResponse addActualReturnDate(Long rentalId) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Rental with ID: {" + rentalId + "} not found!"
                 ));
+        if (rental.getActualReturnDate() != null) {
+            throw new IllegalCallerException(
+                    "Rental with ID: {" + rentalId + "} already returned!"
+            );
+        }
         rental.setActualReturnDate(LocalDate.now());
         rental.setActive(false);
 
@@ -66,6 +85,7 @@ public class RentalServiceImpl implements RentalService {
         carRepository.save(car);
 
         return rentalMapper.toDto(rentalRepository.save(rental));
+
     }
 
     @Override
@@ -107,7 +127,7 @@ public class RentalServiceImpl implements RentalService {
         if (rental.getActualReturnDate() != null &&
                 rental.getActualReturnDate().isAfter(rental.getRentalDate())) {
             long lateDays = ChronoUnit.DAYS.between(rental.getReturnDate(), rental.getActualReturnDate());
-            fines = rental.getCar().getDailyFee().multiply(BigDecimal.valueOf(lateDays)).multiply(BigDecimal.valueOf(1.4)); // 40% fine
+            fines = rental.getCar().getDailyFee().multiply(BigDecimal.valueOf(lateDays)).multiply(BigDecimal.valueOf(1.2)); // 20% fine
         }
 
         return baseAmount.add(fines).setScale(2, RoundingMode.HALF_UP);
