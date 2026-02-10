@@ -1,6 +1,7 @@
 package jlrs.carsharing.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import jlrs.carsharing.dto.rental.CreateRentalRequest;
 import jlrs.carsharing.dto.rental.RentalResponse;
@@ -15,6 +16,7 @@ public interface RentalService {
 
     List<RentalResponse> getRentalsByUserIdAndIsActive(Long id, Boolean isActive);
 
+    List<RentalResponse> getOverdueRentalsByDate(LocalDate date);
 
     BigDecimal calculateTotal(Rental rental);
 }

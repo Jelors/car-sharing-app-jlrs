@@ -13,6 +13,8 @@ import jlrs.carsharing.dto.rental.RentalResponse;
 import jlrs.carsharing.mapper.RentalMapper;
 import jlrs.carsharing.model.Car;
 import jlrs.carsharing.model.Rental;
+import jlrs.carsharing.model.User;
+import jlrs.carsharing.model.UserRole.RoleName;
 import jlrs.carsharing.repository.CarRepository;
 import jlrs.carsharing.repository.RentalRepository;
 import jlrs.carsharing.service.RentalService;
@@ -90,9 +92,18 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     public RentalResponse getRental(Long id) {
-        Rental rental = rentalRepository.findById(id)
+        User user = userDetailsService.getCurrentUser();
+
+        if (user.getRoles().contains(RoleName.MANAGER)) {
+            return rentalMapper.toDto(rentalRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Rental with ID: {" + id + "} not found!"
+                    )));
+        }
+
+        Rental rental = rentalRepository.findByUserIdAndId(user.getId(), id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Rental with ID: {" + id + "} not found!"
+                        "Rental with ID: {" + id + "} not found or you don't have required permission!"
                 ));
         return rentalMapper.toDto(rental);
     }
@@ -100,6 +111,7 @@ public class RentalServiceImpl implements RentalService {
     @Override
     public List<RentalResponse> getRentalsByUserIdAndIsActive(Long id, Boolean active) {
         List<Rental> rentals;
+        id = userDetailsService.getCurrentUserId();
 
         boolean isActive = (active == null) || active;
 
@@ -131,5 +143,15 @@ public class RentalServiceImpl implements RentalService {
         }
 
         return baseAmount.add(fines).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public List<RentalResponse> getOverdueRentalsByDate(LocalDate date) {
+        List<Rental> rentals = rentalRepository
+                .findAllByReturnDateLessThanEqualAndActualReturnDateIsNull(date);
+
+        return rentals.stream()
+                .map(rentalMapper::toDto)
+                .toList();
     }
 }
