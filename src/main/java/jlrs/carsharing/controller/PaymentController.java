@@ -31,7 +31,7 @@ public class PaymentController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/{sessionId}")
     public ResponseEntity<PaymentResponse> getPaymentBySessionId(
             @RequestParam("session_id") String sessionId
     ) {

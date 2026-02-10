@@ -23,13 +23,13 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 @Component
 public class CarsharingTelegramBot implements SpringLongPollingBot, LongPollingUpdateConsumer {
+    private static final String ACTIVE_RENTALS = "active_rentals";
+    private static final String NOT_ACTIVE_RENTALS = "notActive_rentals";
+
     private final TelegramClient telegramClient;
     private final RentalService rentalService;
     private final String botToken;
     private final String adminChatId;
-
-    private static final String ACTIVE_RENTALS = "active_rentals";
-    private static final String NOT_ACTIVE_RENTALS = "notActive_rentals";
 
     public CarsharingTelegramBot(
             RentalService rentalService,
@@ -88,10 +88,13 @@ public class CarsharingTelegramBot implements SpringLongPollingBot, LongPollingU
      */
     private void sendMainMenu(Long chatId) throws TelegramApiException {
         SendMessage message = SendMessage.builder()
-                .text(" Welcome to Carsharing Application Bot."
-                        + " Here you can get info about rentals."
-                        + " (rentals that is still active or not)."
-                        + " Also you will receive notification about every new rental that was created.")
+                .text(
+                        " Welcome to Carsharing Application Bot."
+                                + " Here you can get info about rentals."
+                                + " (rentals that is still active or not)."
+                                + " Also you will receive notification about"
+                                + " every new rental that was created."
+                )
                 .chatId(chatId)
                 .build();
 
@@ -169,34 +172,25 @@ public class CarsharingTelegramBot implements SpringLongPollingBot, LongPollingU
     if actual return date ain't set yet, returns message without this value
      */
     private String formatSingleRental(RentalResponse rentalResponse) {
-        if (rentalResponse.getActualReturnDate() == null) {
-            return String.format(
-                    "🆔 *Rental ID:* %d\n"
-                            + "🚗 *Car ID:* %d\n"
-                            + "\uD83D\uDC64 *User ID:* %d\n"
-                            + "📅 *Rental date:* %s\n"
-                            + "📅 *Return date:* %s\n",
-                    rentalResponse.getId(),
-                    rentalResponse.getCarId(),
-                    rentalResponse.getUserId(),
-                    rentalResponse.getRentalDate(),
-                    rentalResponse.getReturnDate()
-            );
-        } else {
-            return String.format(
-                    "🆔 *Rental ID:* %d\n"
-                            + "🚗 *Car ID:* %d\n"
-                            + "\uD83D\uDC64 *User ID:* %d\n"
-                            + "📅 *Rental date:* %s\n"
-                            + "📅 *Return date:* %s\n"
-                            + "📅 *Actual return date:* %s\n",
-                    rentalResponse.getId(),
-                    rentalResponse.getCarId(),
-                    rentalResponse.getUserId(),
-                    rentalResponse.getRentalDate(),
-                    rentalResponse.getReturnDate(),
-                    rentalResponse.getActualReturnDate()
-            );
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format(
+                "🆔 *Rental ID:* %d\n"
+                        + "🚗 *Car ID:* %d\n"
+                        + "👤 *User ID:* %d\n"
+                        + "📅 *Rental date:* %s\n"
+                        + "📅 *Return date:* %s\n",
+                rentalResponse.getId(),
+                rentalResponse.getCarId(),
+                rentalResponse.getUserId(),
+                rentalResponse.getRentalDate(),
+                rentalResponse.getReturnDate()
+        ));
+
+        if (rentalResponse.getActualReturnDate() != null) {
+            sb.append(String.format("✅ *Actual return date:* %s\n",
+                    rentalResponse.getActualReturnDate()));
         }
+
+        return sb.toString();
     }
 }
