@@ -4,7 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .env
-pjnotes.txt
+notes.txt
 
 ### STS ###
 .apt_generated

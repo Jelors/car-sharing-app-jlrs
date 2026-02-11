@@ -47,7 +47,9 @@ public class RentalController {
             summary = "Endpoint that sets actual return date",
             description = "Endpoint that sets actual return date"
     )
-    public ResponseEntity<RentalResponse> insertActualReturnDate(@PathVariable Long id) {
+    public ResponseEntity<RentalResponse> setActualReturnDate(
+            @PathVariable Long id
+    ) throws IllegalAccessException {
         return new ResponseEntity<>(
                 rentalService.addActualReturnDate(id),
                 HttpStatus.OK
@@ -74,7 +76,7 @@ public class RentalController {
             description = "Endpoint that returns rentals list"
                     + " and can be specified by {USER_ID} and {IS_ACTIVE}"
     )
-    public ResponseEntity<List<RentalResponse>> getRentals(
+    public ResponseEntity<List<RentalResponse>> getRentalsByUserId(
             @RequestParam(name = "user_id", required = false) Long userId,
             @RequestParam(name = "is_active", required = false) Boolean isActive
     ) {
@@ -83,4 +85,5 @@ public class RentalController {
                 HttpStatus.OK
         );
     }
+
 }

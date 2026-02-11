@@ -44,7 +44,6 @@ public class CarsController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER')")
     @Operation(
             summary = "Get information about car",
             description = "Receive detailed information about car"
@@ -57,7 +56,6 @@ public class CarsController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('MANAGER', 'CUSTOMER')")
     @Operation(
             summary = "Get information about all cars",
             description = "Get information about all available cars"
