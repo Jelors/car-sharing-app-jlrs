@@ -1,23 +1,19 @@
 package jlrs.carsharing.notification;
 
-import java.time.LocalDate;
+import static java.lang.String.format;
+
 import java.util.List;
 import java.util.stream.Collectors;
-import jlrs.carsharing.dto.rental.RentalCreatedEvent;
 import jlrs.carsharing.dto.rental.RentalResponse;
 import jlrs.carsharing.service.RentalService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import static java.lang.String.format;
 
 @Component
 @AllArgsConstructor
 public class NotificationService {
     private final RentalService rentalService;
+
     /*
    method that returns all rentals that was created.
    have two statuses: All Active rentals and Rentals that are not active.
@@ -70,12 +66,12 @@ public class NotificationService {
 
     public String formatOverdueMessage(RentalResponse rental) {
         return format(
-                "⚠️ *OVERDUE RENTAL ALERT* ⚠️\n" +
-                        "🆔 *Rental ID:* %d\n" +
-                        "🚗 *Car:* %s %s\n" +
-                        "👤 *User ID:* %d\n" +
-                        "📅 *Expected Return:* %s\n" +
-                        "❗ *Status:* Car not returned yet!",
+                "⚠️ *OVERDUE RENTAL ALERT* ⚠️\n"
+                        + "🆔 *Rental ID:* %d\n"
+                        + "🚗 *Car:* %s %s\n"
+                        + "👤 *User ID:* %d\n"
+                        + "📅 *Expected Return:* %s\n"
+                        + "❗ *Status:* Car not returned yet!",
                 rental.getId(),
                 rental.getCarId(),
                 rental.getUserId(),

@@ -10,7 +10,7 @@ import jlrs.carsharing.model.Rental;
 public interface RentalService {
     RentalResponse addRental(CreateRentalRequest createRentalRequest);
 
-    RentalResponse addActualReturnDate(Long rentalId);
+    RentalResponse addActualReturnDate(Long rentalId) throws IllegalAccessException;
 
     RentalResponse getRental(Long id);
 

@@ -71,8 +71,8 @@ public class CarsharingTelegramBot implements SpringLongPollingBot, LongPollingU
     }
 
     /*
-   this method will send notification every day at 10:00 AM about overdue rentals.
-   if there will not be overdue rentals, will be sent simple text message, else list of rentals.
+    this method will send notification every day at 10:00 AM about overdue rentals.
+    if there will not be overdue rentals, will be sent simple text message, else list of rentals.
     */
     @Scheduled(cron = "0 0 10 * * *")
     public void checkAndNotifyOverdueRentals() throws TelegramApiException {
@@ -91,6 +91,7 @@ public class CarsharingTelegramBot implements SpringLongPollingBot, LongPollingU
         }
 
     }
+
     /*
     when rental will be created, instantly sends notification about this to admin
     */

@@ -26,7 +26,7 @@ public class PaymentController {
             @RequestParam("user_id") Long userId
     ) {
         return new ResponseEntity<>(
-                paymentService.getAllRentals(userId),
+                paymentService.getAllPayments(userId),
                 HttpStatus.OK
         );
     }
@@ -34,7 +34,7 @@ public class PaymentController {
     @GetMapping("/{sessionId}")
     public ResponseEntity<PaymentResponse> getPaymentBySessionId(
             @RequestParam("session_id") String sessionId
-    ) {
+    ) throws IllegalAccessException {
         return new ResponseEntity<>(
                 paymentService.getPaymentBySessionId(sessionId),
                 HttpStatus.OK

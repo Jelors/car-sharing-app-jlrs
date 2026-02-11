@@ -47,7 +47,9 @@ public class RentalController {
             summary = "Endpoint that sets actual return date",
             description = "Endpoint that sets actual return date"
     )
-    public ResponseEntity<RentalResponse> setActualReturnDate(@PathVariable Long id) {
+    public ResponseEntity<RentalResponse> setActualReturnDate(
+            @PathVariable Long id
+    ) throws IllegalAccessException {
         return new ResponseEntity<>(
                 rentalService.addActualReturnDate(id),
                 HttpStatus.OK

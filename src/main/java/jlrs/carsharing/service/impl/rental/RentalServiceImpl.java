@@ -64,11 +64,18 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     @Transactional
-    public RentalResponse addActualReturnDate(Long rentalId) {
+    public RentalResponse addActualReturnDate(Long rentalId) throws IllegalAccessException {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Rental with ID: {" + rentalId + "} not found!"
                 ));
+
+        if (!rental.getUser().getId().equals(userDetailsService.getCurrentUserId())) {
+            throw new IllegalAccessException(
+                    "You don't have permissions to give back other cars!"
+            );
+        }
+
         if (rental.getActualReturnDate() != null) {
             throw new IllegalCallerException(
                     "Rental with ID: {" + rentalId + "} already returned!"

@@ -6,7 +6,6 @@ import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
@@ -16,17 +15,20 @@ import jlrs.carsharing.dto.payment.PaymentResponse;
 import jlrs.carsharing.mapper.PaymentMapper;
 import jlrs.carsharing.model.Payment;
 import jlrs.carsharing.model.Rental;
+import jlrs.carsharing.model.User;
 import jlrs.carsharing.repository.PaymentRepository;
 import jlrs.carsharing.repository.RentalRepository;
 import jlrs.carsharing.service.PaymentService;
 import jlrs.carsharing.service.RentalService;
-import lombok.RequiredArgsConstructor;
+import jlrs.carsharing.service.impl.user.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import static jlrs.carsharing.model.UserRole.RoleName;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
     private final RentalService rentalService;
+    private final UserDetailsServiceImpl userDetailsService;
     private final PaymentRepository paymentRepository;
     private final RentalRepository rentalRepository;
     private final PaymentMapper paymentMapper;
@@ -42,7 +44,8 @@ public class PaymentServiceImpl implements PaymentService {
             PaymentMapper paymentMapper,
             PaymentRepository paymentRepository,
             RentalRepository rentalRepository,
-            RentalService rentalService
+            RentalService rentalService,
+            UserDetailsServiceImpl userDetailsService
     ) {
         this.cancelUrl = cancelUrl;
         this.endpointSecret = endpointSecret;
@@ -51,49 +54,21 @@ public class PaymentServiceImpl implements PaymentService {
         this.rentalRepository = rentalRepository;
         this.rentalService = rentalService;
         this.successUrl = successUrl;
+        this.userDetailsService = userDetailsService;
     }
 
-    @Override
-    @Transactional
-    public PaymentResponse createPendingPayment(
-            Rental rental,
-            Session session,
-            BigDecimal total
-    ) {
-        Payment payment = new Payment();
-        payment.setRental(rental);
-        payment.setTotal(total);
-        payment.setSessionId(session.getId());
-        payment.setSessionUrl(session.getUrl());
-        payment.setType(Payment.Type.PAYMENT);
-        payment.setStatus(Payment.Status.PENDING);
-
-        return paymentMapper.toDto(paymentRepository.save(payment));
-    }
 
     @Override
-    @Transactional
-    public void markPaymentAsPaid(String sessionId) {
-        Payment payment = paymentRepository.findBySessionId(sessionId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Payment not found for session: " + sessionId
-                ));
-
-        if (payment.getStatus() == Payment.Status.PAID) {
-            throw new RuntimeException("Payment already PAID");
+    public List<PaymentResponse> getAllPayments(Long userId) {
+        User user = userDetailsService.getCurrentUser();
+        if (user.getRoles().contains(RoleName.MANAGER)) {
+            return paymentRepository.findAllByRental_User_Id(userId)
+                    .stream()
+                    .map(paymentMapper::toDto)
+                    .toList();
         }
 
-        payment.setStatus(Payment.Status.PAID);
-
-        Rental rental = payment.getRental();
-        rental.setActive(false);
-
-        paymentRepository.save(payment);
-        rentalRepository.save(rental);
-    }
-
-    @Override
-    public List<PaymentResponse> getAllRentals(Long userId) {
+        userId = user.getId();
         return paymentRepository.findAllByRental_User_Id(userId)
                 .stream()
                 .map(paymentMapper::toDto)
@@ -101,12 +76,19 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentResponse getPaymentBySessionId(String sessionId) {
+    public PaymentResponse getPaymentBySessionId(String sessionId) throws IllegalAccessException {
         Payment payment = paymentRepository.findBySessionId(sessionId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Session with ID: {" + sessionId + "} not found!"
                 ));
-        return paymentMapper.toDto(payment);
+        Long currentUserId = userDetailsService.getCurrentUserId();
+        if (payment.getRental().getUser().getId().equals(currentUserId)
+                || payment.getRental().getUser().getRoles().contains(RoleName.MANAGER)) {
+            return paymentMapper.toDto(payment);
+        }
+
+        throw new IllegalAccessException("You don't have permissions to check "
+                + "other users payments!");
     }
 
     @Override
@@ -162,5 +144,41 @@ public class PaymentServiceImpl implements PaymentService {
         createPendingPayment(rental, session, total);
 
         return new CheckoutResponseDto(session.getUrl());
+    }
+
+    @Transactional
+    private void createPendingPayment(
+            Rental rental,
+            Session session,
+            BigDecimal total
+    ) {
+        Payment payment = new Payment();
+        payment.setRental(rental);
+        payment.setTotal(total);
+        payment.setSessionId(session.getId());
+        payment.setSessionUrl(session.getUrl());
+        payment.setType(Payment.Type.PAYMENT);
+        payment.setStatus(Payment.Status.PENDING);
+        paymentRepository.save(payment);
+    }
+
+    @Transactional
+    private void markPaymentAsPaid(String sessionId) {
+        Payment payment = paymentRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new RuntimeException(
+                        "Payment not found for session: " + sessionId
+                ));
+
+        if (payment.getStatus() == Payment.Status.PAID) {
+            throw new RuntimeException("Payment already PAID");
+        }
+
+        payment.setStatus(Payment.Status.PAID);
+
+        Rental rental = payment.getRental();
+        rental.setActive(false);
+
+        paymentRepository.save(payment);
+        rentalRepository.save(rental);
     }
 }
