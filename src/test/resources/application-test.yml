@@ -2,3 +2,4 @@ spring:
   autoconfigure:
     exclude:
       - org.telegram.telegrambots.longpolling.starter.TelegramBotStarterConfiguration
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
