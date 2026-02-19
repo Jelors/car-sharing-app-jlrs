@@ -9,11 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Sql(scripts = "classpath:database/clear-all-info.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
+@Sql(scripts = "classpath:database/insert/insert-users-to-users-table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "classpath:database/clear-all-info.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
@@ -23,18 +27,10 @@ public class UserRepositoryTest {
             Find user by email that = johnydepp1@gmail.com
             """)
     void findByEmail_ValidEmail_ReturnsUser() {
-        User expected = new User();
-        expected.setId(1L);
-        expected.setEmail("johnydepp1@gmail.com");
-        expected.setFirstName("Johny");
-        expected.setLastName("Depp");
-        expected.setPassword("carribeanPirate123");
+        String expectedEmail = "charlesBill@example.com";
+        Optional<User> actual = userRepository.findByEmail(expectedEmail);
 
-        userRepository.save(expected);
-
-        Optional<User> actual = userRepository.findByEmail(expected.getEmail());
-
-        assertEquals(expected.getEmail(), actual.get().getEmail());
+        assertEquals(expectedEmail, actual.get().getEmail());
     }
 
     @Test
@@ -42,15 +38,8 @@ public class UserRepositoryTest {
             Check if exists user with some special email
             """)
     void existsByEmail_ValidEmail_ReturnsTrue() {
-        User expected = new User();
-        expected.setId(1L);
-        expected.setEmail("johnydepp1@gmail.com");
-        expected.setFirstName("Johny");
-        expected.setLastName("Depp");
-        expected.setPassword("carribeanPirate123");
+        String expectedEmail = "johnSmith@example.com";
 
-        userRepository.save(expected);
-
-        assertTrue(userRepository.existsByEmail(expected.getEmail()));
+        assertTrue(userRepository.existsByEmail(expectedEmail));
     }
 }
