@@ -61,7 +61,9 @@ class UsersControllerTest {
     }
 
     @Test
-    @DisplayName("GET /users/me - Should return profile info")
+    @DisplayName("""
+            GET /users/me - should return profile info
+            """)
     void receiveProfileInfo_ReturnsOk() throws Exception {
         when(userService.getProfileInfo()).thenReturn(userResponse);
 
@@ -72,7 +74,9 @@ class UsersControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /users/{id}/role - Should update role and return 200")
+    @DisplayName("""
+            PUT /users/{id}/role - should update role and return 200
+            """)
     void updateUserRole_ValidRequest_ReturnsOk() throws Exception {
         UpdateUserRoleRequest roleRequest = new UpdateUserRoleRequest();
 
@@ -89,7 +93,9 @@ class UsersControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /users/me/info/updateProfile - Should update profile")
+    @DisplayName("""
+            PUT /users/me/info/updateProfile - should update profile
+            """)
     void updateProfileInfo_ValidRequest_ReturnsOk() throws Exception {
         UpdateProfileRequest profileRequest = new UpdateProfileRequest();
         profileRequest.setFirstName("NewFirstName");
@@ -108,7 +114,9 @@ class UsersControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /users/me/info/updatePassword - Should return 204 No Content")
+    @DisplayName("""
+            PUT /users/me/info/updatePassword - should return 204 No Content
+            """)
     void updatePassword_ValidRequest_ReturnsNoContent() throws Exception {
         UpdatePasswordRequest passwordRequest = new UpdatePasswordRequest();
         passwordRequest.setPassword("new_pass");

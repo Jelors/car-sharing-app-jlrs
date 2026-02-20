@@ -1,3 +1,7 @@
+delete from users;
+delete from rentals;
+delete from payments;
+
 insert into users (id, email, first_name, last_name, password, is_deleted)
 VALUES
     (1, 'charlesBill@example.com', 'Charles', 'Bill', '$2a$10$JVJIs6etszWD4YsLEyz13OlPFd5oSz5z2SAXnJsBczYKHn9oeeb3a', 0),

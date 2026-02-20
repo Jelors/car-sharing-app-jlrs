@@ -133,7 +133,20 @@ class CarsControllerTest {
 
         mockMvc.perform(patch("/cars/1/add")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("5")) // Відправляємо просто число як тіло
+                        .content("5"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("""
+            PATCH /cars/{id}/reduce - success
+            """)
+    void reduceInventory_ValidAmount_ReturnsOk() throws Exception {
+        doNothing().when(carService).reduceInventory(anyLong(), any(Integer.class));
+
+        mockMvc.perform(patch("/cars/1/reduce")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("7"))
                 .andExpect(status().isOk());
     }
 
