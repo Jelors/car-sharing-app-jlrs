@@ -68,7 +68,7 @@ public class NotificationService {
         return format(
                 "⚠️ *OVERDUE RENTAL ALERT* ⚠️\n"
                         + "🆔 *Rental ID:* %d\n"
-                        + "🚗 *Car:* %s %s\n"
+                        + "🚗 *Car ID:* %d\n"
                         + "👤 *User ID:* %d\n"
                         + "📅 *Expected Return:* %s\n"
                         + "❗ *Status:* Car not returned yet!",

@@ -1,5 +1,7 @@
 package jlrs.carsharing.service.payment;
 
+import static jlrs.carsharing.model.UserRole.RoleName;
+
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
@@ -8,8 +10,6 @@ import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import java.math.BigDecimal;
-import java.util.List;
 import jlrs.carsharing.dto.payment.CheckoutResponseDto;
 import jlrs.carsharing.dto.payment.PaymentResponse;
 import jlrs.carsharing.mapper.PaymentMapper;
@@ -23,7 +23,9 @@ import jlrs.carsharing.service.RentalService;
 import jlrs.carsharing.service.impl.user.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import static jlrs.carsharing.model.UserRole.RoleName;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -61,7 +63,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public List<PaymentResponse> getAllPayments(Long userId) {
         User user = userDetailsService.getCurrentUser();
-        if (user.getRoles().contains(RoleName.MANAGER)) {
+        if (user.getRoles().stream()
+                .anyMatch(r -> r.getRole().equals(RoleName.MANAGER))) {
             return paymentRepository.findAllByRental_User_Id(userId)
                     .stream()
                     .map(paymentMapper::toDto)
@@ -81,9 +84,10 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Session with ID: {" + sessionId + "} not found!"
                 ));
-        Long currentUserId = userDetailsService.getCurrentUserId();
-        if (payment.getRental().getUser().getId().equals(currentUserId)
-                || payment.getRental().getUser().getRoles().contains(RoleName.MANAGER)) {
+        User currentUser = userDetailsService.getCurrentUser();
+        boolean isOwner = payment.getRental().getUser().getId().equals(currentUser.getId());
+        boolean isManager = currentUser.getRoles().stream().anyMatch(r -> r.getRole().equals(RoleName.MANAGER));
+        if (isOwner || isManager) {
             return paymentMapper.toDto(payment);
         }
 

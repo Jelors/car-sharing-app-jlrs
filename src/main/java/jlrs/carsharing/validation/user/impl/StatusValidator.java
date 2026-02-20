@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import jlrs.carsharing.validation.user.Status;
 
-public class StatusValidator implements ConstraintValidator<Status, String> {
+public class StatusValidator implements ConstraintValidator<Status, Object> {
     private Set<String> values;
 
     @Override
@@ -18,10 +18,14 @@ public class StatusValidator implements ConstraintValidator<Status, String> {
     }
 
     @Override
-    public boolean isValid(String status,
+    public boolean isValid(Object value,
                            ConstraintValidatorContext constraintValidatorContext
     ) {
-        return status != null && values.contains(status);
+        if (value == null) {
+            return false;
+        }
+        String stringValue = (value instanceof Enum) ? ((Enum<?>) value).name() : value.toString();
+        return values.contains(stringValue);
     }
 
 }

@@ -1,14 +1,18 @@
 package jlrs.carsharing.service.impl.user;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.util.HashSet;
 import java.util.Set;
 import jlrs.carsharing.dto.user.UserResponse;
 import jlrs.carsharing.dto.user.profile.UpdatePasswordRequest;
 import jlrs.carsharing.dto.user.profile.UpdateProfileRequest;
 import jlrs.carsharing.dto.user.profile.UpdateUserRoleRequest;
+import jlrs.carsharing.exception.RoleNotFoundException;
 import jlrs.carsharing.mapper.UserMapper;
 import jlrs.carsharing.model.User;
+import jlrs.carsharing.model.UserRole;
 import jlrs.carsharing.repository.UserRepository;
+import jlrs.carsharing.repository.UserRoleRepository;
 import jlrs.carsharing.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final UserDetailsServiceImpl userDetailsService;
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
 
     /*
@@ -49,7 +54,11 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "User with id {" + id + "} not found!"
                 ));
-        user.setRoles(Set.of(updateRequest.getRole()));
+
+        UserRole userRole = userRoleRepository.findByRole(updateRequest.getRole())
+                .orElseThrow(() -> new RoleNotFoundException("Role not found: " + updateRequest.getRole()));
+
+        user.setRoles(new HashSet<>(Set.of(userRole)));
         return userMapper.toUserResponse(userRepository.save(user));
     }
 

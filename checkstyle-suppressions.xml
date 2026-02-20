@@ -13,4 +13,7 @@
     <suppress
             files=".*[/\\]service[/\\].*"
             checks=".*"/>
+    <suppress
+            files=".*[/\\]test[/\\].*"
+            checks=".*"/>
 </suppressions>

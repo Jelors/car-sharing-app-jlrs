@@ -76,7 +76,7 @@ public class UsersController {
             summary = "Update password",
             description = "Updates password current logged user"
     )
-    public ResponseEntity<UserResponse> updatePassword(
+    public ResponseEntity<?> updatePassword(
             @RequestBody @Valid UpdatePasswordRequest passwordRequestDto
     ) {
         return new ResponseEntity<>(
