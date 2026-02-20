@@ -17,6 +17,7 @@ import jlrs.carsharing.mapper.UserMapper;
 import jlrs.carsharing.model.User;
 import jlrs.carsharing.model.UserRole;
 import jlrs.carsharing.repository.UserRepository;
+import jlrs.carsharing.repository.UserRoleRepository;
 import jlrs.carsharing.service.impl.user.UserDetailsServiceImpl;
 import jlrs.carsharing.service.impl.user.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,8 @@ class UserServiceTest {
     private UserMapper userMapper;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserRoleRepository userRoleRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
 
@@ -96,12 +99,17 @@ class UserServiceTest {
             """)
     void updateUserRole_ValidRequest_ReturnsUpdatedUser() {
         Long userId = 1L;
-        UserRole userRole = new UserRole();
-        userRole.setId(1L);
-        userRole.setRole(UserRole.RoleName.MANAGER);
-        userRole.setDeleted(false);
+
+        UserRole userRoleManager = new UserRole();
+        userRoleManager.setId(1L);
+        userRoleManager.setRole(UserRole.RoleName.MANAGER);
+        userRoleManager.setDeleted(false);
+
         UpdateUserRoleRequest roleRequest = new UpdateUserRoleRequest();
-        roleRequest.setRole(userRole);
+        roleRequest.setRole(UserRole.RoleName.MANAGER);
+
+        when(userRoleRepository.findByRole(UserRole.RoleName.MANAGER))
+                .thenReturn(Optional.of(userRoleManager));
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
@@ -110,6 +118,7 @@ class UserServiceTest {
         UserResponse result = userService.updateUserRole(userId, roleRequest);
 
         assertThat(result).isNotNull();
+        verify(userRoleRepository).findByRole(UserRole.RoleName.MANAGER); // перевіряємо, що пошук ролі був
         verify(userRepository).save(user);
     }
 
