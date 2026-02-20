@@ -2,11 +2,6 @@ package jlrs.carsharing.service.impl.rental;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 import jlrs.carsharing.dto.rental.CreateRentalRequest;
 import jlrs.carsharing.dto.rental.RentalCreatedEvent;
 import jlrs.carsharing.dto.rental.RentalResponse;
@@ -22,6 +17,12 @@ import jlrs.carsharing.service.impl.user.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -101,7 +102,8 @@ public class RentalServiceImpl implements RentalService {
     public RentalResponse getRental(Long id) {
         User user = userDetailsService.getCurrentUser();
 
-        if (user.getRoles().contains(RoleName.MANAGER)) {
+        if (user.getRoles().stream()
+                .anyMatch(r -> r.getRole().equals(RoleName.MANAGER))) {
             return rentalMapper.toDto(rentalRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException(
                             "Rental with ID: {" + id + "} not found!"
