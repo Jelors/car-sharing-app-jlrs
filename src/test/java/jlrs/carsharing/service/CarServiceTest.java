@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-class CarServiceImplTest {
+class CarServiceTest {
 
     @Mock
     private CarRepository carRepository;

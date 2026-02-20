@@ -63,7 +63,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public List<PaymentResponse> getAllPayments(Long userId) {
         User user = userDetailsService.getCurrentUser();
-        if (user.getRoles().contains(RoleName.MANAGER)) {
+        if (user.getRoles().stream()
+                .anyMatch(r -> r.getRole().equals(RoleName.MANAGER))) {
             return paymentRepository.findAllByRental_User_Id(userId)
                     .stream()
                     .map(paymentMapper::toDto)
@@ -83,9 +84,10 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Session with ID: {" + sessionId + "} not found!"
                 ));
-        Long currentUserId = userDetailsService.getCurrentUserId();
-        if (payment.getRental().getUser().getId().equals(currentUserId)
-                || payment.getRental().getUser().getRoles().contains(RoleName.MANAGER)) {
+        User currentUser = userDetailsService.getCurrentUser();
+        boolean isOwner = payment.getRental().getUser().getId().equals(currentUser.getId());
+        boolean isManager = currentUser.getRoles().stream().anyMatch(r -> r.getRole().equals(RoleName.MANAGER));
+        if (isOwner || isManager) {
             return paymentMapper.toDto(payment);
         }
 

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.util.Optional;
 import jlrs.carsharing.dto.user.UserResponse;
 import jlrs.carsharing.dto.user.profile.UpdatePasswordRequest;
 import jlrs.carsharing.dto.user.profile.UpdateProfileRequest;
@@ -27,10 +28,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Optional;
-
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
     @Mock
     private UserDetailsServiceImpl userDetailsService;
     @Mock

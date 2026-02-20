@@ -14,7 +14,6 @@ public class CarsharingApplication {
         app.addInitializers(new EnvConfig());
         app.run(args);
 
-        // SpringApplication.run(CarsharingApplication.class, args);
     }
 
 }

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.util.Optional;
 import jlrs.carsharing.model.User;
 import jlrs.carsharing.repository.UserRepository;
 import jlrs.carsharing.service.impl.user.UserDetailsServiceImpl;
@@ -23,10 +24,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.Optional;
-
 @ExtendWith(MockitoExtension.class)
-public class UserDetailsServiceImplTest {
+class UserDetailsServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
