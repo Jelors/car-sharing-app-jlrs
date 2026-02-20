@@ -5,7 +5,10 @@ delete
 from rentals;
 
 delete
+from cars;
+
+delete
 from users;
 
 delete
-from users_roles;
+from roles;

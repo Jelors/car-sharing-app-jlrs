@@ -1,6 +1,6 @@
-delete from users;
-delete from rentals;
 delete from payments;
+delete from rentals;
+delete from users;
 
 insert into users (id, email, first_name, last_name, password, is_deleted)
 VALUES

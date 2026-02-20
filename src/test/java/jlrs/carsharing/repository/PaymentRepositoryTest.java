@@ -2,6 +2,7 @@ package jlrs.carsharing.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import jakarta.transaction.Transactional;
 import jlrs.carsharing.model.Payment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,10 +17,12 @@ import java.util.List;
 import java.util.Optional;
 
 @DataJpaTest
+@Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Sql(scripts = "classpath:database/insert/insert-users-to-users-table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(scripts = "classpath:database/insert/insert-rentals-to-rentals-table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(scripts = "classpath:database/insert/insert-payments-to-payments-table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+//@Sql(scripts = "classpath:database/insert/insert-users-to-users-table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+//@Sql(scripts = "classpath:database/insert/insert-rentals-to-rentals-table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+//@Sql(scripts = "classpath:database/insert/insert-payments-to-payments-table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "classpath:database/insert/insert-info.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = "classpath:database/clear-all-info.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class PaymentRepositoryTest {
     @Autowired
