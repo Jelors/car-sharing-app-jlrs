@@ -8,6 +8,7 @@ import jlrs.carsharing.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'MANAGER')")
     public ResponseEntity<List<PaymentResponse>> getPayments(
             @RequestParam("user_id") Long userId
     ) {
@@ -32,6 +34,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{sessionId}")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'MANAGER')")
     public ResponseEntity<PaymentResponse> getPaymentBySessionId(
             @RequestParam("session_id") String sessionId
     ) throws IllegalAccessException {
@@ -42,6 +45,7 @@ public class PaymentController {
     }
 
     @PostMapping("/checkout/{rentalId}")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'MANAGER')")
     public ResponseEntity<CheckoutResponseDto> createCheckout(
             @PathVariable Long rentalId
     ) throws StripeException {

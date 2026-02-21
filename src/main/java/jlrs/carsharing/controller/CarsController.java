@@ -83,7 +83,7 @@ public class CarsController {
         );
     }
 
-    @PatchMapping("/{id}/add")
+    @PatchMapping("/{id}/inventory/increase")
     @PreAuthorize("hasRole('MANAGER')")
     @Operation(
             summary = "Add amount to car's inventory",
@@ -96,13 +96,13 @@ public class CarsController {
         carService.addInventory(id, amount);
     }
 
-    @PatchMapping("/{id}/reduce")
+    @PatchMapping("/{id}/inventory/reduce")
     @PreAuthorize("hasRole('MANAGER')")
     @Operation(
             summary = "Minus amount from car's inventory",
             description = "Reduce amount of available car's in inventory"
     )
-    public void reduceInventory(
+        public void reduceInventory(
             @PathVariable Long id,
             @RequestBody int amount
     ) {
