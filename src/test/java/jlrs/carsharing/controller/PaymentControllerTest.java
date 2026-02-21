@@ -73,7 +73,7 @@ class PaymentControllerTest {
     void getPaymentBySessionId_ValidParam_ReturnsPayment() throws Exception {
         when(paymentService.getPaymentBySessionId("session_123")).thenReturn(paymentResponse);
 
-        mockMvc.perform(get("/payments/some_id")
+        mockMvc.perform(get("/payments/session")
                         .param("session_id", "session_123"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sessionId").value("session_123"));

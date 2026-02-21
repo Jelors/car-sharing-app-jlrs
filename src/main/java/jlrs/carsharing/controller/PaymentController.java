@@ -1,6 +1,7 @@
 package jlrs.carsharing.controller;
 
 import com.stripe.exception.StripeException;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import jlrs.carsharing.dto.payment.CheckoutResponseDto;
 import jlrs.carsharing.dto.payment.PaymentResponse;
@@ -25,7 +26,7 @@ public class PaymentController {
     @GetMapping
     @PreAuthorize("hasAnyRole('CUSTOMER', 'MANAGER')")
     public ResponseEntity<List<PaymentResponse>> getPayments(
-            @RequestParam("user_id") Long userId
+            @RequestParam(value = "user_id", required = false) @Positive Long userId
     ) {
         return new ResponseEntity<>(
                 paymentService.getAllPayments(userId),
@@ -33,7 +34,7 @@ public class PaymentController {
         );
     }
 
-    @GetMapping("/{sessionId}")
+    @GetMapping("/session")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'MANAGER')")
     public ResponseEntity<PaymentResponse> getPaymentBySessionId(
             @RequestParam("session_id") String sessionId
@@ -47,7 +48,7 @@ public class PaymentController {
     @PostMapping("/checkout/{rentalId}")
     @PreAuthorize("hasAnyRole('CUSTOMER', 'MANAGER')")
     public ResponseEntity<CheckoutResponseDto> createCheckout(
-            @PathVariable Long rentalId
+            @PathVariable @Positive Long rentalId
     ) throws StripeException {
         return new ResponseEntity<>(
                 paymentService.createCheckout(rentalId),
