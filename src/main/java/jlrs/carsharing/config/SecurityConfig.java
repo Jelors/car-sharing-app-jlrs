@@ -33,23 +33,31 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/webhooks/**",
-                                "/payments/**",
+                        .requestMatchers(
                                 "/auth/**",
-                                "/swagger-ui/**",
+                                "/payments/**",
+                                "/cars/**",
+                                "/webhooks/**",
                                 "/v3/api-docs/**",
-                                "/cars/**"
+                                "/v3/api-docs.yaml",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/api/swagger-ui/**",
+                                "/api/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/error"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
                 .userDetailsService(userDetailsService)
-                .addFilterBefore(jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
