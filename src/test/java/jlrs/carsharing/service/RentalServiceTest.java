@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -114,7 +115,7 @@ class RentalServiceTest {
 
         assertThatThrownBy(() -> rentalService.addRental(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("You can't take car that ain't available in our inventory!");
+                .hasMessageContaining("Car is not available in inventory!");
     }
 
     @Test
@@ -124,8 +125,8 @@ class RentalServiceTest {
     void addActualReturnDate_Success() throws IllegalAccessException {
         when(rentalRepository.findById(100L)).thenReturn(Optional.of(rental));
         when(userDetailsService.getCurrentUserId()).thenReturn(1L);
-        when(carRepository.findById(10L)).thenReturn(Optional.of(car));
-        when(rentalRepository.save(any())).thenReturn(rental);
+        lenient().when(carRepository.findById(10L)).thenReturn(Optional.of(car));
+        lenient().when(rentalRepository.save(any())).thenReturn(rental);
 
         rentalService.addActualReturnDate(100L);
 

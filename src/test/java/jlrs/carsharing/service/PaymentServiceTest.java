@@ -45,7 +45,6 @@ class PaymentServiceTest {
     @BeforeEach
     void setUp() {
         paymentService = new PaymentServiceImpl(
-                "http://success.url", "http://cancel.url", "whsec_test",
                 paymentMapper, paymentRepository, rentalRepository, rentalService, userDetailsService
         );
     }

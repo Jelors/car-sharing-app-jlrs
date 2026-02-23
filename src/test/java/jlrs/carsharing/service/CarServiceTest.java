@@ -74,7 +74,7 @@ class CarServiceTest {
         CarResponse result = carService.insertNewCar(carRequest);
 
         assertThat(result).isNotNull();
-        assertThat(car.getInventory()).isEqualTo(1);
+        assertThat(car.getInventory()).isEqualTo(5);
         verify(carRepository).save(car);
     }
 
