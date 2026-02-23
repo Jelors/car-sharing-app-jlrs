@@ -33,13 +33,13 @@ public class Payment {
     private Rental rental;
 
     @Column(name = "session_url", nullable = false, length = 2048)
-    private String sessionUrl; // URL for the payment session with a payment provider
+    private String sessionUrl;
 
     @Column(name = "session_id", nullable = false, unique = true)
-    private String sessionId; // ID of the payment session
+    private String sessionId;
 
     @Column(nullable = false)
-    private BigDecimal total; // calculated rental total price ($USD)
+    private BigDecimal total;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -54,7 +54,9 @@ public class Payment {
 
     public enum Status {
         PENDING,
-        PAID
+        PAID,
+        FAILED,
+        CANCELED
     }
 
     public enum Type {

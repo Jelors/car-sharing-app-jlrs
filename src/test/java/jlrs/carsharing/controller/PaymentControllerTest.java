@@ -16,6 +16,7 @@ import jlrs.carsharing.exception.GlobalExceptionHandler;
 import jlrs.carsharing.model.Payment;
 import jlrs.carsharing.security.JwtUtil;
 import jlrs.carsharing.service.PaymentService;
+import jlrs.carsharing.service.payment.StripePaymentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,9 @@ class PaymentControllerTest {
 
     @MockitoBean
     private PaymentService paymentService;
+
+    @MockitoBean
+    private StripePaymentService stripePaymentService;
 
     @MockitoBean
     private JwtUtil jwtUtil;
@@ -85,7 +89,7 @@ class PaymentControllerTest {
             """)
     void createCheckout_ValidRentalId_ReturnsCreated() throws Exception {
         CheckoutResponseDto checkoutResponse = new CheckoutResponseDto("http://stripe.com/pay");
-        when(paymentService.createCheckout(10L)).thenReturn(checkoutResponse);
+        when(stripePaymentService.createCheckout(10L)).thenReturn(checkoutResponse);
 
         mockMvc.perform(post("/payments/checkout/10"))
                 .andExpect(status().isCreated())
@@ -97,7 +101,7 @@ class PaymentControllerTest {
             POST /payments/checkout/{rentalId} - should handle StripeException
             """)
     void createCheckout_StripeError_ReturnsInternalServerError() throws Exception {
-        when(paymentService.createCheckout(anyLong())).thenThrow(new StripeException("Error", "id", "code", 500) {
+        when(stripePaymentService.createCheckout(anyLong())).thenThrow(new StripeException("Error", "id", "code", 500) {
         });
 
         mockMvc.perform(post("/payments/checkout/10"))

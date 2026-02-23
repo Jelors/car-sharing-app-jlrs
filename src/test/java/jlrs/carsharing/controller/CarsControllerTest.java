@@ -60,6 +60,7 @@ class CarsControllerTest {
         carRequest.setBrand("Tesla");
         carRequest.setType(Car.Type.SEDAN);
         carRequest.setDailyFee(BigDecimal.valueOf(100));
+        carRequest.setInventory(5);
 
         carResponse = new CarResponse();
         carResponse.setId(1L);
@@ -145,8 +146,8 @@ class CarsControllerTest {
         doNothing().when(carService).reduceInventory(anyLong(), any(Integer.class));
 
         mockMvc.perform(patch("/cars/1/inventory/reduce")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("7"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("7"))
                 .andExpect(status().isOk());
     }
 

@@ -36,6 +36,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/**",
+                                "/payments/success",
+                                "/payments/cancel",
                                 "/payments/**",
                                 "/cars/**",
                                 "/webhooks/**",

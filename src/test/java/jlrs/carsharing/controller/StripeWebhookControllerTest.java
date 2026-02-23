@@ -7,8 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import jlrs.carsharing.security.JwtAuthenticationFilter;
 import jlrs.carsharing.security.JwtUtil;
-import jlrs.carsharing.service.PaymentService;
 import jlrs.carsharing.service.impl.user.UserDetailsServiceImpl;
+import jlrs.carsharing.service.payment.StripePaymentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ class StripeWebhookControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private PaymentService paymentService;
+    private StripePaymentService stripePaymentService;
 
     @MockitoBean
     private JwtUtil jwtUtil;
@@ -44,7 +44,7 @@ class StripeWebhookControllerTest {
         String payload = "{\"id\": \"evt_123\"}";
         String sigHeader = "t=123,v1=abc";
 
-        doNothing().when(paymentService).handleWebhook(anyString(), anyString());
+        doNothing().when(stripePaymentService).handleWebhook(anyString(), anyString());
 
         mockMvc.perform(post("/webhooks/stripe")
                         .header("Stripe-Signature", sigHeader)
