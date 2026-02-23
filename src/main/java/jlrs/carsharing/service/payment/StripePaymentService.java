@@ -55,16 +55,19 @@ public class StripePaymentService {
         Event event;
         try {
             event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+
+            String eventType = event.getType();
+
+            if ("checkout.session.completed".equals(eventType)) {
+                Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
+                markPaymentAsPaid(session.getId());
+            }
+            else if ("checkout.session.expired".equals(eventType)) {
+                Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow();
+                updatePaymentStatus(session.getId(), Payment.Status.FAILED);
+            }
         } catch (SignatureVerificationException e) {
             throw new RuntimeException("Invalid Stripe signature");
-        }
-
-        if ("checkout.session.completed".equals(event.getType())) {
-            Session session = (Session) event.getDataObjectDeserializer()
-                    .getObject()
-                    .orElseThrow();
-
-            markPaymentAsPaid(session.getId());
         }
     }
 
@@ -79,8 +82,8 @@ public class StripePaymentService {
         SessionCreateParams params =
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
-                        .setSuccessUrl(successUrl)
-                        .setCancelUrl(cancelUrl)
+                        .setSuccessUrl(successUrl + "?session_id={CHECKOUT_SESSION_ID}")
+                        .setCancelUrl(cancelUrl + "?session_id={CHECKOUT_SESSION_ID")
                         .addLineItem(
                                 SessionCreateParams.LineItem.builder()
                                         .setQuantity(1L)
@@ -110,14 +113,15 @@ public class StripePaymentService {
         return new CheckoutResponseDto(pendingPayment.getSessionUrl());
     }
 
-    private void markPaymentAsPaid(String sessionId) {
+    @Transactional
+    public void markPaymentAsPaid(String sessionId) {
         Payment payment = paymentRepository.findBySessionId(sessionId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Payment not found for session: " + sessionId
                 ));
 
         if (payment.getStatus() == Payment.Status.PAID) {
-            throw new RuntimeException("Payment already PAID");
+            return;
         }
 
         payment.setStatus(Payment.Status.PAID);
@@ -129,6 +133,19 @@ public class StripePaymentService {
         rentalRepository.save(rental);
     }
 
+    @Transactional
+    public void updatePaymentStatus(String sessionId, Payment.Status status) {
+        Payment payment = paymentRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new EntityNotFoundException("Payment not found"));
+
+        if (payment.getStatus() == Payment.Status.PAID) {
+            return;
+        }
+
+        payment.setStatus(status);
+        paymentRepository.save(payment);
+    }
+
     private PaymentResponse createPendingPayment(
             CreatePendingPaymentRequestDto requestDto
     ) {
@@ -136,6 +153,5 @@ public class StripePaymentService {
         paymentRepository.save(payment);
         return paymentMapper.toDto(payment);
     }
-
 
 }
