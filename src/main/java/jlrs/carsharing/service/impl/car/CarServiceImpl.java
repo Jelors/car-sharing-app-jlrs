@@ -20,7 +20,6 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarResponse insertNewCar(CreateCarRequest createCarRequest) {
         Car car = carMapper.toModel(createCarRequest);
-        car.setInventory(1);
         carRepository.save(car);
         return carMapper.toDto(car);
     }

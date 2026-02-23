@@ -1,6 +1,7 @@
 package jlrs.carsharing.dto.car;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import jlrs.carsharing.model.Car;
 import lombok.Getter;
@@ -17,4 +18,7 @@ public class CreateCarRequest {
     private BigDecimal dailyFee;
     @NotNull
     private Car.Type type;
+    @NotNull
+    @Positive
+    private int inventory;
 }

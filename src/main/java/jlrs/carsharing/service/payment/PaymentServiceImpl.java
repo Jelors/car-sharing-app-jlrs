@@ -10,7 +10,10 @@ import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
+import java.util.List;
 import jlrs.carsharing.dto.payment.CheckoutResponseDto;
+import jlrs.carsharing.dto.payment.CreatePendingPaymentRequestDto;
 import jlrs.carsharing.dto.payment.PaymentResponse;
 import jlrs.carsharing.mapper.PaymentMapper;
 import jlrs.carsharing.model.Payment;
@@ -23,9 +26,6 @@ import jlrs.carsharing.service.RentalService;
 import jlrs.carsharing.service.impl.user.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -145,31 +145,30 @@ public class PaymentServiceImpl implements PaymentService {
 
         Session session = Session.create(params);
 
-        createPendingPayment(rental, session, total);
+        CreatePendingPaymentRequestDto requestDto = new CreatePendingPaymentRequestDto(
+                rental.getId(),
+                session.getUrl(),
+                session.getId(),
+                total
+        );
 
-        return new CheckoutResponseDto(session.getUrl());
+        PaymentResponse pendingPayment = createPendingPayment(requestDto);
+
+        return new CheckoutResponseDto(pendingPayment.getSessionUrl());
     }
 
-    @Transactional
-    private void createPendingPayment(
-            Rental rental,
-            Session session,
-            BigDecimal total
+    private PaymentResponse createPendingPayment(
+            CreatePendingPaymentRequestDto requestDto
     ) {
-        Payment payment = new Payment();
-        payment.setRental(rental);
-        payment.setTotal(total);
-        payment.setSessionId(session.getId());
-        payment.setSessionUrl(session.getUrl());
-        payment.setType(Payment.Type.PAYMENT);
-        payment.setStatus(Payment.Status.PENDING);
+        Payment payment = paymentMapper.toModelFromCreateRequest(requestDto, rentalRepository);
         paymentRepository.save(payment);
+        return paymentMapper.toDto(payment);
     }
 
     @Transactional
-    private void markPaymentAsPaid(String sessionId) {
+    public void markPaymentAsPaid(String sessionId) {
         Payment payment = paymentRepository.findBySessionId(sessionId)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "Payment not found for session: " + sessionId
                 ));
 
