@@ -20,5 +20,5 @@ public class CreateCarRequest {
     private Car.Type type;
     @NotNull
     @Positive
-    private int inventory;
+    private Integer inventory;
 }

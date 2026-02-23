@@ -196,6 +196,24 @@ GET /cars/{ID} - receive information about specific car by car_id
 }
 ````
 
+**Demonstration video:** https://www.loom.com/share/bdb54bf2b2f444f6b16a9f294175971a
+
+**Screenshots from telegram bot:**
+
+- Notification about every new rental
+
+![img.png](img.png)
+
+- Notification about all active rentals
+
+![img_2.png](img_2.png)
+
+- Notification about all/not active rentals
+
+![img_1.png](img_1.png)
+
+Also, at 10 a.m. every day bot will send you notification about all overdue rentals.
+
 ---
 
 ## 💾 Database Schema
