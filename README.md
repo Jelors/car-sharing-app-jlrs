@@ -37,13 +37,20 @@ payments.
 
 ### 1️⃣ Local launch:
 
-**Step 1.** Install dependencies
+**Step 1.** Clone the repository:
+
+````bash
+git clone [https://github.com/Jelors/car-sharing-app-jlrs.git](https://github.com/Jelors/car-sharing-app-jlrs.git)
+cd car-sharing-app-jlrs
+````
+
+**Step 2.** Install dependencies
 
 ````bash
 mvn clean install
 ````
 
-**Step 2.** Launch the app
+**Step 3.** Launch the app
 
 ````bash
 mvn spring-boot:run
