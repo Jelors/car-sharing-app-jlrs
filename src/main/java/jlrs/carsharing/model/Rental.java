@@ -26,13 +26,12 @@ public class Rental {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "rental_date", nullable = false)
+    @Column(nullable = false)
     private LocalDate rentalDate;
 
-    @Column(name = "return_date", nullable = false)
+    @Column(nullable = false)
     private LocalDate returnDate;
 
-    @Column(name = "actual_return_date")
     private LocalDate actualReturnDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,9 +42,9 @@ public class Rental {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "is_active", nullable = false)
-    private boolean active = true;
+    @Column(nullable = false)
+    private boolean isActive = true;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
+    @Column(nullable = false)
+    private boolean isDeleted = false;
 }

@@ -97,8 +97,8 @@ public class RentalServiceImpl implements RentalService {
         Long targetUserId = isManager(currentUser) ? userId : currentUser.getId();
 
         List<Rental> rentals = (targetUserId != null)
-                ? rentalRepository.findAllByUserIdAndActive(targetUserId, isActive)
-                : rentalRepository.findAllByActive(isActive);
+                ? rentalRepository.findAllByUserIdAndIsActive(targetUserId, isActive)
+                : rentalRepository.findAllByIsActive(isActive);
 
         return rentals.stream()
                 .map(rentalMapper::toDto)

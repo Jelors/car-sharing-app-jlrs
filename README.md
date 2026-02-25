@@ -37,13 +37,20 @@ payments.
 
 ### 1️⃣ Local launch:
 
-**Step 1.** Install dependencies
+**Step 1.** Clone the repository:
+
+````bash
+git clone [https://github.com/Jelors/car-sharing-app-jlrs.git](https://github.com/Jelors/car-sharing-app-jlrs.git)
+cd car-sharing-app-jlrs
+````
+
+**Step 2.** Install dependencies
 
 ````bash
 mvn clean install
 ````
 
-**Step 2.** Launch the app
+**Step 3.** Launch the app
 
 ````bash
 mvn spring-boot:run
@@ -220,9 +227,68 @@ Also, at 10 a.m. every day bot will send you notification about all overdue rent
 
 The system uses a normalized MySQL schema including:
 
-- **Tables: cars, payments, rentals, users, roles.**
+````
+Relation Diagram
+USER ||--o{ RENTAL : "has many"
+USER }|--|{ ROLE : "has roles"
+CAR ||--o{ RENTAL : "is rented in"
+RENTAL ||--o{ PAYMENT : "generates"
 
-- **Relationships: Properly handled One-to-Many and Many-to-Many mappings.**
+    USER {
+        Long id PK
+        String email UK
+        String firstName
+        String lastName
+        String password
+        boolean isDeleted
+    }
+
+    ROLE {
+        Long id PK
+        Enum roleName UK
+    }
+
+    CAR {
+        Long id PK
+        String model UK
+        String brand
+        BigDecimal dailyFee
+        Enum type
+        int inventory
+        boolean isDeleted
+    }
+
+    RENTAL {
+        Long id PK
+        LocalDate rentalDate
+        LocalDate returnDate
+        LocalDate actualReturnDate
+        Long car_id FK
+        Long user_id FK
+        boolean isActive
+        boolean isDeleted
+    }
+
+    PAYMENT {
+        Long id PK
+        Long rental_id FK
+        String sessionId UK
+        String sessionUrl
+        BigDecimal total
+        Enum status
+        Enum type
+        boolean isDeleted
+    }
+
+````
+
+- **Users & Roles** (Many-to-Many) **||** User can have few roles, like CUSTOMER and MANAGER, and one role can relate to many users.
+
+- **Users & Rentals** (One-to-Many) **||** One user can have many rentals. 
+
+- **Cars & Rentals** (One-to-Many) **||** A specific car may appear in many rentals (at different time intervals).
+
+- **Rentals & Payments** (One-to-Many) **||** A rental may have multiple payments (e.g. principal payment + late payment penalty)
 
 ---
 

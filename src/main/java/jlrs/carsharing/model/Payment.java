@@ -32,10 +32,10 @@ public class Payment {
     @JoinColumn(name = "rental_id", nullable = false)
     private Rental rental;
 
-    @Column(name = "session_url", nullable = false, length = 2048)
+    @Column(nullable = false, length = 2048)
     private String sessionUrl;
 
-    @Column(name = "session_id", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String sessionId;
 
     @Column(nullable = false)
@@ -49,7 +49,7 @@ public class Payment {
     @Column(nullable = false)
     private Type type = Type.PAYMENT;
 
-    @Column(name = "is_deleted", nullable = false)
+    @Column(nullable = false)
     private boolean isDeleted = false;
 
     public enum Status {

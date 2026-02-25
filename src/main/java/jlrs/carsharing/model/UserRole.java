@@ -29,7 +29,7 @@ public class UserRole implements GrantedAuthority {
     @Enumerated(EnumType.STRING)
     private RoleName role;
 
-    @Column(name = "is_deleted", nullable = false)
+    @Column(nullable = false)
     private boolean isDeleted = false;
 
     @Override

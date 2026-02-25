@@ -7,9 +7,9 @@ import jlrs.carsharing.model.Rental;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RentalRepository extends JpaRepository<Rental, Long> {
-    List<Rental> findAllByUserIdAndActive(Long userId, boolean active);
+    List<Rental> findAllByUserIdAndIsActive(Long userId, boolean isActive);
 
-    List<Rental> findAllByActive(boolean active);
+    List<Rental> findAllByIsActive(boolean isActive);
 
     List<Rental> findAllByReturnDateLessThanEqualAndActualReturnDateIsNull(LocalDate date);
 

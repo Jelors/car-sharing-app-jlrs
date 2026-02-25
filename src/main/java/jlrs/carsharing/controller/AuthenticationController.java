@@ -2,6 +2,7 @@ package jlrs.carsharing.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jlrs.carsharing.dto.user.UserResponse;
 import jlrs.carsharing.dto.user.auth.UserLoginRequest;
 import jlrs.carsharing.dto.user.auth.UserLoginResponse;
@@ -28,7 +29,7 @@ public class AuthenticationController {
             description = "Register a new user"
     )
     public ResponseEntity<UserResponse> register(
-            @RequestBody UserRegistrationRequest registrationRequest
+            @RequestBody @Valid UserRegistrationRequest registrationRequest
     ) {
         return new ResponseEntity<UserResponse>(
                 authenticationService.register(registrationRequest),
@@ -42,7 +43,7 @@ public class AuthenticationController {
             description = "Authenticate user by email and password"
     )
     public ResponseEntity<UserLoginResponse> login(
-            @RequestBody UserLoginRequest loginRequest
+            @RequestBody @Valid UserLoginRequest loginRequest
     ) {
         return new ResponseEntity<UserLoginResponse>(
                 authenticationService.authenticate(loginRequest),
