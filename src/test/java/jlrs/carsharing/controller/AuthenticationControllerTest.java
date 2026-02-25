@@ -53,7 +53,10 @@ class AuthenticationControllerTest {
     void register_ValidRequest_ReturnsCreated() throws Exception {
         UserRegistrationRequest request = new UserRegistrationRequest();
         request.setEmail("test@example.com");
-        request.setPassword("password123");
+        request.setPassword("password1234567");
+        request.setRepeatPassword("password1234567");
+        request.setFirstName("Test FirstName");
+        request.setLastName("Test LastName");
 
         UserResponse expectedResponse = new UserResponse();
         expectedResponse.setEmail("test@example.com");

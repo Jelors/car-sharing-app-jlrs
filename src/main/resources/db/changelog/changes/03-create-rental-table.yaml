@@ -43,18 +43,20 @@ databaseChangeLog:
                     nullable: false
 
               - column:
+                  name: is_active
+                  type: bit(1)
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+              - column:
                   name: is_deleted
                   type: bit(1)
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
 
-              - column:
-                  name: is_active
-                  type: bit(1)
-                  defaultValueBoolean: true
-                  constraints:
-                    nullable: false
+
 
         - addForeignKeyConstraint:
             baseTableName: rentals

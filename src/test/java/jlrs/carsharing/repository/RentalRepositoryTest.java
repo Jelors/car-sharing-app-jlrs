@@ -30,9 +30,9 @@ public class RentalRepositoryTest {
     @DisplayName("""
             Find all rentals by user ID and their status, returns LIST
             """)
-    void findAllByUserIdAndActive_UserIdIsTwoAndStatusActive_ShouldReturnOneRental() {
+    void findAllByUserIdAndActive_UserIdIsTwoAndStatusIsActive_ShouldReturnOneRental() {
         int expectedRentalListSize = 1;
-        List<Rental> actualRentalList = rentalRepository.findAllByUserIdAndActive(2L, true);
+        List<Rental> actualRentalList = rentalRepository.findAllByUserIdAndIsActive(2L, true);
 
         assertEquals(expectedRentalListSize, actualRentalList.size());
     }
@@ -53,10 +53,10 @@ public class RentalRepositoryTest {
     @DisplayName("""
             Find all rentals by their status
             """)
-    void findAllByActive_ValidInput_StatusActive() {
+    void findAllByActive_ValidInput_StatusIsActive() {
         int expectedRentalsListSize = 2;
 
-        List<Rental> actualRentalList = rentalRepository.findAllByActive(true);
+        List<Rental> actualRentalList = rentalRepository.findAllByIsActive(true);
 
         assertEquals(expectedRentalsListSize, actualRentalList.size());
     }
