@@ -19,8 +19,6 @@ import java.util.Optional;
 @Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = "classpath:database/insert/insert-info.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-//@Sql(scripts = "classpath:database/insert/insert-users-to-users-table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-//@Sql(scripts = "classpath:database/insert/insert-rentals-to-rentals-table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = "classpath:database/clear-all-info.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class RentalRepositoryTest {
     @Autowired
@@ -30,7 +28,7 @@ public class RentalRepositoryTest {
     @DisplayName("""
             Find all rentals by user ID and their status, returns LIST
             """)
-    void findAllByUserIdAndActive_UserIdIsTwoAndStatusIsActive_ShouldReturnOneRental() {
+    void findAllByUserIdAndIsActive_UserIdIsTwoAndStatusIsActive_ShouldReturnOneRental() {
         int expectedRentalListSize = 1;
         List<Rental> actualRentalList = rentalRepository.findAllByUserIdAndIsActive(2L, true);
 
@@ -53,7 +51,7 @@ public class RentalRepositoryTest {
     @DisplayName("""
             Find all rentals by their status
             """)
-    void findAllByActive_ValidInput_StatusIsActive() {
+    void findAllByIsActive_ValidInput_StatusIsActive() {
         int expectedRentalsListSize = 2;
 
         List<Rental> actualRentalList = rentalRepository.findAllByIsActive(true);
